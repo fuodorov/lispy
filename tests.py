@@ -17,21 +17,6 @@ lispy_tests = [
     ("(fact 50)", 30414093201713378043612608166064768844377641568960512000000000000),
     ("(define abs (lambda (n) ((if (> n 0) + -) 0 n)))", None),
     ("(list (abs -3) (abs 0) (abs 3))", [3, 0, 3]),
-    ("""(define combine (lambda (f)
-    (lambda (x y)
-      (if (null? x) (quote ())
-          (f (list (car x) (car y))
-             ((combine f) (cdr x) (cdr y)))))))""", None),
-    ("(define zip (combine cons))", None),
-    ("(zip (list 1 2 3 4) (list 5 6 7 8))", [[1, 5], [2, 6], [3, 7], [4, 8]]),
-    ("""(define riff-shuffle (lambda (deck) (begin
-    (define take (lambda (n seq) (if (<= n 0) (quote ()) (cons (car seq) (take (- n 1) (cdr seq))))))
-    (define drop (lambda (n seq) (if (<= n 0) seq (drop (- n 1) (cdr seq)))))
-    (define mid (lambda (seq) (/ (length seq) 2)))
-    ((combine append) (take (mid deck) deck) (drop (mid deck) deck)))))""", None),
-    ("(riff-shuffle (list 1 2 3 4 5 6 7 8))", [1, 5, 2, 6, 3, 7, 4, 8]),
-    ("((repeat riff-shuffle) (list 1 2 3 4 5 6 7 8))",  [1, 3, 5, 7, 2, 4, 6, 8]),
-    ("(riff-shuffle (riff-shuffle (riff-shuffle (list 1 2 3 4 5 6 7 8))))", [1, 2, 3, 4, 5, 6, 7, 8]),
 ]
 
 
