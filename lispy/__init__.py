@@ -1,16 +1,16 @@
-from .types import Symbol, EOF_OBJECT, Exp, Atom
-from .parser import InPort, to_string, read
-from .env import global_env, Env
-from .evaluator import eval, Procedure
-from .repl import repl, parse, load
+from .env import Env, global_env  # noqa: F401
+from .evaluator import Procedure, eval  # noqa: F401
+from .parser import InPort, read, to_string  # noqa: F401
 from .primitives import add_globals
+from .repl import load, parse, repl  # noqa: F401
+from .types import EOF_OBJECT, Atom, Exp, Symbol  # noqa: F401
 
 # Initialize globals
 add_globals(global_env)
 
 # Initialize standard macros
 eval(parse("""(begin
-(define-macro and (lambda args 
+(define-macro and (lambda args
    (if (null? args) #t
        (if (= (length args) 1) (car args)
            `(if ,(car args) (and ,@(cdr args)) #f)))))

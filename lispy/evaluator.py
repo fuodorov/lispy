@@ -1,6 +1,8 @@
-from typing import List, Optional, Any
-from .types import Symbol, Exp, _quote, _if, _set, _define, _lambda, _begin
+from typing import Any, List, Optional
+
 from .env import Env, global_env
+from .types import Exp, Symbol, _begin, _define, _if, _lambda, _quote, _set
+
 
 class Procedure:
     """A user-defined Scheme procedure."""
@@ -10,17 +12,18 @@ class Procedure:
     def __call__(self, *args: Exp) -> Any:
         return eval(self.exp, Env(self.parms, args, self.env))
 
+
 def eval(x: Exp, env: Optional[Env] = None) -> Any:
     """Evaluate an expression in an environment."""
     if env is None:
         env = global_env
-    
+
     while True:
         if isinstance(x, Symbol):       # variable reference
             return env.find(x)[x]
         elif not isinstance(x, list):   # constant literal
             return x
-        
+
         op = x[0]
         if op is _quote:                # (quote exp)
             return x[1]

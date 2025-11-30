@@ -1,10 +1,12 @@
-import sys
 import io
+import sys
 from typing import Optional, TextIO, Union
-from .types import Exp, EOF_OBJECT
-from .parser import InPort, read, to_string
+
 from .evaluator import eval
 from .macros import expand
+from .parser import InPort, read, to_string
+from .types import EOF_OBJECT, Exp
+
 
 def parse(inport: Union[str, InPort]) -> Exp:
     """Parse a program: read and expand/error-check it."""
@@ -12,9 +14,11 @@ def parse(inport: Union[str, InPort]) -> Exp:
         inport = InPort(io.StringIO(inport))
     return expand(read(inport), toplevel=True)
 
+
 def load(filename: str) -> None:
     """Eval every expression from a file."""
     repl(None, InPort(open(filename)), None)
+
 
 def repl(prompt: str = 'lispy> ', inport: Optional[InPort] = None, out: Optional[TextIO] = sys.stdout) -> None:
     """A prompt-read-eval-print loop."""

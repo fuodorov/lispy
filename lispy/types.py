@@ -1,4 +1,4 @@
-from typing import Union, List, Any, Dict
+from typing import Any, Dict, List, Union
 
 Symbol = str
 Number = Union[int, float]
@@ -7,15 +7,18 @@ ListType = List[Any]
 Exp = Union[Atom, ListType]
 EnvType = Dict[str, Any]
 
+
 class Symbol(str):
     """A Scheme Symbol."""
     pass
+
 
 def get_symbol(s: str, symbol_table: Dict[str, Symbol] = {}) -> Symbol:
     """Find or create unique Symbol entry for str s in symbol table."""
     if s not in symbol_table:
         symbol_table[s] = Symbol(s)
     return symbol_table[s]
+
 
 # Global symbols
 _quote = get_symbol('quote')

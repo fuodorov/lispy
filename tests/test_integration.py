@@ -1,8 +1,10 @@
-import pytest
-import lispy
 import io
 
-# The user provided a list of tests and expected outputs. 
+import pytest
+
+import lispy
+
+# The user provided a list of tests and expected outputs.
 # I will create a script that runs these tests using lispy.repl or lispy.eval.
 
 tests = [
@@ -50,7 +52,7 @@ tests = [
     ("(if 1 2 3 4)", "SyntaxError: (if 1 2 3 4): wrong length"),
     ("(lambda 3 3)", "SyntaxError: (lambda 3 3): illegal lambda argument list"),
     ("(lambda (x))", "SyntaxError: (lambda (x)): wrong length"),
-    ("""(if (= 1 2) (define-macro a 'a) 
+    ("""(if (= 1 2) (define-macro a 'a)
     (define-macro a 'b))""", "SyntaxError: (define-macro a (quote a)): define-macro only allowed at top level"),
     ("(define (twice x) (* 2 x))", "None"),
     ("(twice 2)", "4"),
@@ -83,7 +85,7 @@ tests = [
     ("(call/cc (lambda (throw) \n         (+ 5 (* 10 (call/cc (lambda (escape) (* 100 (escape 3))))))))", "35"),
     ("(call/cc (lambda (throw) \n         (+ 5 (* 10 (call/cc (lambda (escape) (* 100 (throw 3))))))))", "3"),
     ("(call/cc (lambda (throw) \n         (+ 5 (* 10 (call/cc (lambda (escape) (* 100 1)))))))", "1005"),
-    ("(* 1i 1i)", "(-1+0i)"), # Python complex uses j, but lispy converts to i
+    ("(* 1i 1i)", "(-1+0i)"),  # Python complex uses j, but lispy converts to i
     ("(sqrt -1)", "1i"),
     ("(let ((a 1) (b 2)) (+ a b))", "3"),
     ("(let ((a 1) (b 2 3)) (+ a b))", "SyntaxError: (let ((a 1) (b 2 3)) (+ a b)): illegal binding list"),
@@ -109,10 +111,11 @@ tests = [
      3)""", "(1 2 3)")
 ]
 
+
 @pytest.mark.parametrize("input_str, expected", tests)
 def test_lispy_repl(input_str, expected):
     inport = lispy.InPort(io.StringIO(input_str))
-    
+
     try:
         x = lispy.parse(inport)
         if x is lispy.EOF_OBJECT:

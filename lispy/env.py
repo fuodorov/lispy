@@ -1,10 +1,17 @@
-from typing import List, Union, Optional, Any
-from .types import Symbol, Exp
+from typing import List, Optional, Union
+
 from .parser import to_string
+from .types import Exp, Symbol
+
 
 class Env(dict):
     """An environment: a dict of {'var':val} pairs, with an outer Env."""
-    def __init__(self, parms: Union[List[Symbol], Symbol] = (), args: List[Exp] = (), outer: Optional['Env'] = None) -> None:
+    def __init__(
+        self,
+        parms: Union[List[Symbol], Symbol] = (),
+        args: List[Exp] = (),
+        outer: Optional['Env'] = None
+    ) -> None:
         self.outer = outer
         if isinstance(parms, Symbol):
             self.update({parms: list(args)})
@@ -21,5 +28,6 @@ class Env(dict):
             raise LookupError(var)
         else:
             return self.outer.find(var)
+
 
 global_env = Env()

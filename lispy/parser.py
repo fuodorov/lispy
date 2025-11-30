@@ -1,7 +1,8 @@
 import re
-import io
-from typing import Optional, TextIO, Union
-from .types import Symbol, Exp, Atom, EOF_OBJECT, QUOTES, get_symbol
+from typing import Optional, TextIO
+
+from .types import EOF_OBJECT, QUOTES, Atom, Exp, Symbol, get_symbol
+
 
 class InPort:
     """An input port. Retains a line of chars."""
@@ -22,6 +23,7 @@ class InPort:
             if token != '' and not token.startswith(';'):
                 return token
 
+
 def readchar(inport: InPort) -> str:
     """Read the next character from an input port."""
     if inport.line != '':
@@ -29,6 +31,7 @@ def readchar(inport: InPort) -> str:
         return ch
     else:
         return inport.file.read(1) or EOF_OBJECT
+
 
 def read(inport: InPort) -> Exp:
     """Read a Scheme expression from an input port."""
@@ -53,6 +56,7 @@ def read(inport: InPort) -> Exp:
     token1 = inport.next_token()
     return EOF_OBJECT if token1 is EOF_OBJECT else read_ahead(token1)
 
+
 def atom(token: str) -> Atom:
     """Numbers become numbers; #t and #f are booleans; "..." string; otherwise Symbol."""
     if token == '#t':
@@ -71,6 +75,7 @@ def atom(token: str) -> Atom:
                 return complex(token.replace('i', 'j', 1))
             except ValueError:
                 return get_symbol(token)
+
 
 def to_string(x: Exp) -> str:
     """Convert a Python object back into a Lisp-readable string."""
