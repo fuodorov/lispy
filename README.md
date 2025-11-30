@@ -93,6 +93,26 @@ isort .
 
 Настроена автоматическая проверка кода (Linting) и запуск тестов (Testing) через GitHub Actions. Тесты запускаются только после успешного прохождения линтеров.
 
+## Документация
+
+Проект содержит подробную документацию, сгенерированную с помощью [Sphinx](https://www.sphinx-doc.org/).
+
+### Просмотр онлайн
+Актуальная версия документации доступна на GitHub Pages:
+[https://fuodorov.github.io/lispy/](https://fuodorov.github.io/lispy/)
+
+### Сборка локально
+Для сборки документации локально выполните:
+
+```bash
+# Установка зависимостей для документации
+pip install -r requirements/docs.txt
+
+# Сборка HTML версии
+sphinx-build -b html docs docs/_build/html
+```
+После сборки откройте файл `docs/_build/html/index.html` в браузере.
+
 ## Реализованные фичи (Checklist)
 
 - [x] Базовый синтаксис и семантика Scheme
