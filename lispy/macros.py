@@ -25,13 +25,37 @@ def is_pair(x: Exp) -> bool:
 
 
 def require(x: Exp, predicate: bool, msg: str = "wrong length") -> None:
-    """Signal a syntax error if predicate is false."""
+    """
+    Signal a syntax error if predicate is false.
+
+    Args:
+        x (Exp): The expression causing the error.
+        predicate (bool): The condition that must be true.
+        msg (str): The error message. Defaults to "wrong length".
+
+    Raises:
+        SyntaxError: If predicate is False.
+    """
     if not predicate:
         raise SyntaxError(to_string(x) + ': ' + msg)
 
 
 def expand(x: Exp, toplevel: bool = False) -> Exp:
-    """Walk tree of x, making optimizations/fixes, and signaling SyntaxError."""
+    """
+    Walk tree of x, making optimizations/fixes, and signaling SyntaxError.
+
+    This function handles macro expansion and syntax checking for special forms.
+
+    Args:
+        x (Exp): The expression to expand.
+        toplevel (bool): Whether this is a top-level expression (relevant for define-macro).
+
+    Returns:
+        Exp: The expanded expression.
+
+    Raises:
+        SyntaxError: If the syntax is invalid.
+    """
     require(x, x != [])                 # () => Error
     if not isinstance(x, list):         # constant => unchanged
         return x
@@ -89,7 +113,17 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
 
 
 def expand_quasiquote(x: Exp) -> Exp:
-    """Expand `x => 'x; `,x => x; `(,@x y) => (append x y) """
+    """
+    Expand quasiquote expressions.
+
+    Expands `` `x => 'x``, `` `,x => x``, and `` `(,@x y) => (append x y)``.
+
+    Args:
+        x (Exp): The quasiquoted expression.
+
+    Returns:
+        Exp: The expanded expression using cons, append, and quote.
+    """
     if not is_pair(x):
         return [_quote, x]
     require(x, x[0] is not _unquotesplicing, "can't splice here")
@@ -104,6 +138,17 @@ def expand_quasiquote(x: Exp) -> Exp:
 
 
 def let(*args: Exp) -> Exp:
+    """
+    Expand a `let` expression into a lambda application.
+
+    (let ((v1 e1) ...) body...) => ((lambda (v1 ...) body...) e1 ...)
+
+    Args:
+        *args (Exp): The arguments to the let macro (bindings and body).
+
+    Returns:
+        Exp: The expanded expression.
+    """
     args = list(args)
     x = [_let] + args
     require(x, len(args) > 1)

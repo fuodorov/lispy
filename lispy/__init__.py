@@ -1,3 +1,17 @@
+"""
+Lispy: A simple Lisp interpreter in Python.
+
+This package provides a complete Lisp interpreter with support for:
+- Basic Scheme primitives
+- Macros (define-macro)
+- Tail call optimization (via Python's stack, limited)
+- REPL
+- File loading
+
+Usage:
+    >>> import lispy
+    >>> lispy.repl()
+"""
 from .env import Env, global_env  # noqa: F401
 from .evaluator import Procedure, eval  # noqa: F401
 from .parser import InPort, read, to_string  # noqa: F401

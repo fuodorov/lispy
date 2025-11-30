@@ -14,7 +14,18 @@ from .types import EOF_OBJECT, Exp, ListType, Symbol
 
 
 def callcc(proc: Callable) -> Any:
-    """Call proc with current continuation; escape only"""
+    """
+    Call proc with current continuation; escape only.
+
+    Args:
+        proc (Callable): The procedure to call.
+
+    Returns:
+        Any: The result of the procedure or the continuation value.
+
+    Raises:
+        RuntimeWarning: Used to implement the continuation jump.
+    """
     ball = RuntimeWarning("Sorry, can't continue this continuation any longer.")
 
     def throw(retval: Any) -> None:
@@ -30,15 +41,42 @@ def callcc(proc: Callable) -> Any:
 
 
 def is_pair(x: Exp) -> bool:
+    """
+    Check if x is a pair (non-empty list).
+
+    Args:
+        x (Exp): The expression to check.
+
+    Returns:
+        bool: True if x is a pair, False otherwise.
+    """
     return x != [] and isinstance(x, list)
 
 
 def cons(x: Any, y: ListType) -> ListType:
+    """
+    Construct a new list with x as the first element and y as the rest.
+
+    Args:
+        x (Any): The first element.
+        y (ListType): The rest of the list.
+
+    Returns:
+        ListType: The new list.
+    """
     return [x] + list(y)
 
 
 def add_globals(env: Env) -> Env:
-    """Add some Scheme standard procedures."""
+    """
+    Add some Scheme standard procedures to the environment.
+
+    Args:
+        env (Env): The environment to populate.
+
+    Returns:
+        Env: The updated environment.
+    """
     env.update(vars(math))
     env.update(vars(cmath))
     env.update({

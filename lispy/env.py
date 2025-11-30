@@ -5,13 +5,31 @@ from .types import Exp, Symbol
 
 
 class Env(dict):
-    """An environment: a dict of {'var':val} pairs, with an outer Env."""
+    """
+    An environment: a dict of {'var':val} pairs, with an outer Env.
+
+    This class represents a scope in the Scheme interpreter. It inherits from `dict`
+    to store variable bindings and maintains a reference to the outer (enclosing)
+    environment for lexical scoping.
+    """
     def __init__(
         self,
         parms: Union[List[Symbol], Symbol] = (),
         args: List[Exp] = (),
         outer: Optional['Env'] = None
     ) -> None:
+        """
+        Initialize the Environment.
+
+        Args:
+            parms (Union[List[Symbol], Symbol]): Parameter names. Can be a list of symbols
+                or a single symbol (for variadic functions).
+            args (List[Exp]): Argument values corresponding to `parms`.
+            outer (Optional[Env]): The outer environment. Defaults to None.
+
+        Raises:
+            TypeError: If the number of arguments does not match the number of parameters.
+        """
         self.outer = outer
         if isinstance(parms, Symbol):
             self.update({parms: list(args)})
@@ -21,7 +39,18 @@ class Env(dict):
             self.update(zip(parms, args))
 
     def find(self, var: Symbol) -> 'Env':
-        """Find the innermost Env where var appears."""
+        """
+        Find the innermost Env where var appears.
+
+        Args:
+            var (Symbol): The variable name to look up.
+
+        Returns:
+            Env: The environment containing the variable.
+
+        Raises:
+            LookupError: If the variable is not found in this or any outer environment.
+        """
         if var in self:
             return self
         elif self.outer is None:

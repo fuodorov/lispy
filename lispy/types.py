@@ -9,12 +9,27 @@ EnvType = Dict[str, Any]
 
 
 class Symbol(str):
-    """A Scheme Symbol."""
+    """
+    A Scheme Symbol.
+
+    This class inherits from `str` and is used to represent Scheme symbols
+    in the Python environment.
+    """
     pass
 
 
 def get_symbol(s: str, symbol_table: Dict[str, Symbol] = {}) -> Symbol:
-    """Find or create unique Symbol entry for str s in symbol table."""
+    """
+    Find or create a unique Symbol entry for the string `s` in the symbol table.
+
+    Args:
+        s (str): The string representation of the symbol.
+        symbol_table (Dict[str, Symbol], optional): The symbol table to use.
+            Defaults to a persistent mutable dictionary.
+
+    Returns:
+        Symbol: The unique Symbol instance corresponding to `s`.
+    """
     if s not in symbol_table:
         symbol_table[s] = Symbol(s)
     return symbol_table[s]

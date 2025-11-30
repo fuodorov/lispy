@@ -5,16 +5,53 @@ from .types import Exp, Symbol, _begin, _define, _if, _lambda, _quote, _set
 
 
 class Procedure:
-    """A user-defined Scheme procedure."""
+    """
+    A user-defined Scheme procedure.
+
+    Attributes:
+        parms (List[Symbol]): The parameter names.
+        exp (Exp): The body of the procedure.
+        env (Env): The environment in which the procedure was defined (closure).
+    """
     def __init__(self, parms: List[Symbol], exp: Exp, env: Env) -> None:
+        """
+        Initialize the Procedure.
+
+        Args:
+            parms (List[Symbol]): Parameter names.
+            exp (Exp): Procedure body expression.
+            env (Env): Definition environment.
+        """
         self.parms, self.exp, self.env = parms, exp, env
 
     def __call__(self, *args: Exp) -> Any:
+        """
+        Call the procedure with the given arguments.
+
+        Args:
+            *args (Exp): The arguments to pass to the procedure.
+
+        Returns:
+            Any: The result of evaluating the procedure body.
+        """
         return eval(self.exp, Env(self.parms, args, self.env))
 
 
 def eval(x: Exp, env: Optional[Env] = None) -> Any:
-    """Evaluate an expression in an environment."""
+    """
+    Evaluate an expression in an environment.
+
+    This is the core evaluation loop. It handles variable lookups, constant literals,
+    special forms (quote, if, set!, define, lambda, begin), and procedure calls.
+    It implements Tail Call Optimization (TCO) by using a loop for tail calls.
+
+    Args:
+        x (Exp): The expression to evaluate.
+        env (Optional[Env]): The environment to evaluate in. Defaults to global_env.
+
+    Returns:
+        Any: The result of the evaluation.
+    """
     if env is None:
         env = global_env
 
