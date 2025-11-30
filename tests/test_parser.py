@@ -1,4 +1,5 @@
 import io
+
 import pytest
 
 from lispy import errors, parser, types

@@ -1,4 +1,5 @@
 import sys
+
 from .repl import load, repl
 
 if __name__ == "__main__":
