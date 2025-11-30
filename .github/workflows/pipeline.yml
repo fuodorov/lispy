@@ -1,4 +1,4 @@
-name: CI
+name: Pipeline
 
 on:
   push:
@@ -58,7 +58,7 @@ jobs:
         pytest tests
 
   docs:
-    needs: lint
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
