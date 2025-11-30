@@ -1,6 +1,6 @@
 import pytest
 
-from lispy import env, types
+from lispy import env, errors, types
 
 
 def test_env_init_empty():
@@ -20,7 +20,7 @@ def test_env_init_params():
 def test_env_init_mismatch():
     keys = [types.get_symbol("x")]
     vals = [1, 2]
-    with pytest.raises(TypeError):
+    with pytest.raises(errors.ArgumentError):
         env.Env(keys, vals)
 
 
@@ -38,7 +38,7 @@ def test_env_find_outer():
 
 def test_env_find_missing():
     e = env.Env()
-    with pytest.raises(LookupError):
+    with pytest.raises(errors.SymbolNotFoundError):
         e.find(types.get_symbol("z"))
 
 

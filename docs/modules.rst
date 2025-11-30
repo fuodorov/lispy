@@ -14,6 +14,11 @@ Lispy Modules
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: lispy.errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. automodule:: lispy.parser
    :members:
    :undoc-members:

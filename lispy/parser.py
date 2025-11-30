@@ -1,6 +1,7 @@
 import re
 from typing import Optional, TextIO
 
+from .errors import ParseError
 from .types import EOF_OBJECT, QUOTES, Atom, Exp, Symbol, get_symbol
 
 
@@ -69,7 +70,7 @@ def read(inport: InPort) -> Exp:
         Exp: The parsed Scheme expression (Atom or List).
 
     Raises:
-        SyntaxError: If the syntax is invalid (e.g., unexpected EOF or parenthesis).
+        ParseError: If the syntax is invalid (e.g., unexpected EOF or parenthesis).
     """
     def read_ahead(token: str) -> Exp:
         if '(' == token:
@@ -81,11 +82,11 @@ def read(inport: InPort) -> Exp:
                 else:
                     L.append(read_ahead(token))
         elif ')' == token:
-            raise SyntaxError('unexpected )')
+            raise ParseError('unexpected )')
         elif token in QUOTES:
             return [QUOTES[token], read(inport)]
         elif token is EOF_OBJECT:
-            raise SyntaxError('unexpected EOF in list')
+            raise ParseError('unexpected EOF in list')
         else:
             return atom(token)
 

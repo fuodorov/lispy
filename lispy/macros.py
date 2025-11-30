@@ -1,3 +1,4 @@
+from .errors import SchemeSyntaxError
 from .evaluator import eval
 from .parser import to_string
 from .types import (
@@ -34,15 +35,15 @@ def require(x: Exp, predicate: bool, msg: str = "wrong length") -> None:
         msg (str): The error message. Defaults to "wrong length".
 
     Raises:
-        SyntaxError: If predicate is False.
+        SchemeSyntaxError: If predicate is False.
     """
     if not predicate:
-        raise SyntaxError(to_string(x) + ': ' + msg)
+        raise SchemeSyntaxError(to_string(x) + ': ' + msg)
 
 
 def expand(x: Exp, toplevel: bool = False) -> Exp:
     """
-    Walk tree of x, making optimizations/fixes, and signaling SyntaxError.
+    Walk tree of x, making optimizations/fixes, and signaling SchemeSyntaxError.
 
     This function handles macro expansion and syntax checking for special forms.
 
@@ -54,7 +55,7 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
         Exp: The expanded expression.
 
     Raises:
-        SyntaxError: If the syntax is invalid.
+        SchemeSyntaxError: If the syntax is invalid.
     """
     require(x, x != [])                 # () => Error
     if not isinstance(x, list):         # constant => unchanged

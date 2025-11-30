@@ -2,6 +2,7 @@ import io
 import sys
 from typing import Optional, TextIO, Union
 
+from .errors import LispyError
 from .evaluator import eval
 from .macros import expand
 from .parser import InPort, read, to_string
@@ -56,6 +57,8 @@ def repl(prompt: str = 'lispy> ', inport: Optional[InPort] = None, out: Optional
             val = eval(x)
             if val is not None and out:
                 print(to_string(val), file=out)
+        except LispyError as e:
+            print('%s: %s' % (type(e).__name__, e))
         except Exception as e:
             print('%s: %s' % (type(e).__name__, e))
 

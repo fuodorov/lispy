@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 
+from .errors import ArgumentError, SymbolNotFoundError
 from .parser import to_string
 from .types import Exp, Symbol
 
@@ -28,14 +29,14 @@ class Env(dict):
             outer (Optional[Env]): The outer environment. Defaults to None.
 
         Raises:
-            TypeError: If the number of arguments does not match the number of parameters.
+            ArgumentError: If the number of arguments does not match the number of parameters.
         """
         self.outer = outer
         if isinstance(parms, Symbol):
             self.update({parms: list(args)})
         else:
             if len(args) != len(parms):
-                raise TypeError('expected %s, given %s, ' % (to_string(parms), to_string(args)))
+                raise ArgumentError('expected %s, given %s, ' % (to_string(parms), to_string(args)))
             self.update(zip(parms, args))
 
     def find(self, var: Symbol) -> 'Env':
@@ -49,12 +50,12 @@ class Env(dict):
             Env: The environment containing the variable.
 
         Raises:
-            LookupError: If the variable is not found in this or any outer environment.
+            SymbolNotFoundError: If the variable is not found in this or any outer environment.
         """
         if var in self:
             return self
         elif self.outer is None:
-            raise LookupError(var)
+            raise SymbolNotFoundError(var)
         else:
             return self.outer.find(var)
 

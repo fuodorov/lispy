@@ -1,6 +1,7 @@
 import io
+import pytest
 
-from lispy import parser, types
+from lispy import errors, parser, types
 
 
 def test_atom_numbers():
@@ -75,3 +76,15 @@ def test_to_string():
     assert parser.to_string("hello") == '"hello"'
     assert parser.to_string(types.get_symbol("x")) == "x"
     assert parser.to_string([types.get_symbol("+"), 1, 2]) == "(+ 1 2)"
+
+
+def test_read_error_unexpected_eof():
+    inp = parser.InPort(io.StringIO("("))
+    with pytest.raises(errors.ParseError):
+        parser.read(inp)
+
+
+def test_read_error_unexpected_paren():
+    inp = parser.InPort(io.StringIO(")"))
+    with pytest.raises(errors.ParseError):
+        parser.read(inp)

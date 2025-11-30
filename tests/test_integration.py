@@ -45,18 +45,18 @@ tests = [
     ("(riff-shuffle (list 1 2 3 4 5 6 7 8))", "(1 5 2 6 3 7 4 8)"),
     ("((repeat riff-shuffle) (list 1 2 3 4 5 6 7 8))", "(1 3 5 7 2 4 6 8)"),
     ("(riff-shuffle (riff-shuffle (riff-shuffle (list 1 2 3 4 5 6 7 8))))", "(1 2 3 4 5 6 7 8)"),
-    ("()", "SyntaxError: (): wrong length"),
-    ("(set! x)", "SyntaxError: (set! x): wrong length"),
-    ("(define 3 4)", "SyntaxError: (define 3 4): can define only a symbol"),
-    ("(quote 1 2)", "SyntaxError: (quote 1 2): wrong length"),
-    ("(if 1 2 3 4)", "SyntaxError: (if 1 2 3 4): wrong length"),
-    ("(lambda 3 3)", "SyntaxError: (lambda 3 3): illegal lambda argument list"),
-    ("(lambda (x))", "SyntaxError: (lambda (x)): wrong length"),
+    ("()", "SchemeSyntaxError: (): wrong length"),
+    ("(set! x)", "SchemeSyntaxError: (set! x): wrong length"),
+    ("(define 3 4)", "SchemeSyntaxError: (define 3 4): can define only a symbol"),
+    ("(quote 1 2)", "SchemeSyntaxError: (quote 1 2): wrong length"),
+    ("(if 1 2 3 4)", "SchemeSyntaxError: (if 1 2 3 4): wrong length"),
+    ("(lambda 3 3)", "SchemeSyntaxError: (lambda 3 3): illegal lambda argument list"),
+    ("(lambda (x))", "SchemeSyntaxError: (lambda (x)): wrong length"),
     ("""(if (= 1 2) (define-macro a 'a)
-    (define-macro a 'b))""", "SyntaxError: (define-macro a (quote a)): define-macro only allowed at top level"),
+    (define-macro a 'b))""", "SchemeSyntaxError: (define-macro a (quote a)): define-macro only allowed at top level"),
     ("(define (twice x) (* 2 x))", "None"),
     ("(twice 2)", "4"),
-    ("(twice 2 2)", "TypeError: expected (x), given (2 2), "),
+    ("(twice 2 2)", "ArgumentError: expected (x), given (2 2), "),
     ("(define lyst (lambda items items))", "None"),
     ("(lyst 1 2 3 (+ 2 2))", "(1 2 3 4)"),
     ("(if 1 2)", "2"),
@@ -88,7 +88,7 @@ tests = [
     ("(* 1i 1i)", "(-1+0i)"),  # Python complex uses j, but lispy converts to i
     ("(sqrt -1)", "1i"),
     ("(let ((a 1) (b 2)) (+ a b))", "3"),
-    ("(let ((a 1) (b 2 3)) (+ a b))", "SyntaxError: (let ((a 1) (b 2 3)) (+ a b)): illegal binding list"),
+    ("(let ((a 1) (b 2 3)) (+ a b))", "SchemeSyntaxError: (let ((a 1) (b 2 3)) (+ a b)): illegal binding list"),
     ("(and 1 2 3)", "3"),
     ("(and (> 2 1) 2 3)", "3"),
     ("(and)", "#t"),
@@ -104,7 +104,7 @@ tests = [
     ("(define L (list 1 2 3))", "None"),
     ("`(testing ,@L testing)", "(testing 1 2 3 testing)"),
     ("`(testing ,L testing)", "(testing (1 2 3) testing)"),
-    ("`,@L", "SyntaxError: (unquote-splicing L): can't splice here"),
+    ("`,@L", "SchemeSyntaxError: (unquote-splicing L): can't splice here"),
     ("""'(1 ;test comments '
      ;skip this line
      2 ; more ; comments ; ) )
@@ -126,7 +126,7 @@ def test_lispy_repl(input_str, expected):
     except Exception as e:
         res = f"{type(e).__name__}: {e}"
 
-    if "SyntaxError" in expected or "TypeError" in expected:
+    if "SchemeSyntaxError" in expected or "ArgumentError" in expected:
         error_type = expected.split(':')[0]
         assert error_type in res, f"Expected error {expected}, got {res}"
     else:
