@@ -9,8 +9,7 @@ description = "A simple Lisp interpreter in Python"
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
-  { name="Peter Norvig", email="peter@norvig.com" },
-  { name="Lispy Contributors" },
+  { name="Slava Fuodorov", email="slava@fuodorov.ru" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
