@@ -58,3 +58,10 @@ def repl(prompt: str = 'lispy> ', inport: Optional[InPort] = None, out: Optional
                 print(to_string(val), file=out)
         except Exception as e:
             print('%s: %s' % (type(e).__name__, e))
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        load(sys.argv[1])
+    else:
+        repl()

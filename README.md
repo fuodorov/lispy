@@ -41,7 +41,7 @@ tests/
 Чтобы запустить интерактивную оболочку:
 
 ```bash
-python3 -m lispy.repl
+python3 -m lispy
 ```
 
 Пример сессии:
@@ -58,7 +58,7 @@ lispy> (fact 10)
 
 ### Запуск файла
 ```bash
-python3 -m lispy.repl my_script.scm
+python3 -m lispy my_script.scm
 ```
 
 ## Разработка
