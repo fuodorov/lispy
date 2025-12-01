@@ -2,7 +2,7 @@ import io
 import sys
 from typing import Optional, TextIO, Union
 
-from .constants import PROMPT, VERSION_STRING
+from .messages import PROMPT, WELCOME, GOODBYE
 from .errors import LispyError
 from .evaluator import eval
 from .macros import expand
@@ -46,7 +46,7 @@ def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[Te
     """
     if inport is None:
         inport = InPort(sys.stdin)
-    sys.stderr.write(VERSION_STRING)
+    sys.stderr.write(WELCOME + '\n')
     while True:
         try:
             if prompt:
@@ -54,6 +54,7 @@ def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[Te
                 sys.stderr.flush()
             x = parse(inport)
             if x is EOF_OBJECT:
+                sys.stderr.write(GOODBYE + '\n')
                 return
             val = eval(x)
             if val is not None and out:

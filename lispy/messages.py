@@ -6,3 +6,7 @@ ERR_MACRO_PROCEDURE = "macro must be a procedure"
 ERR_DEFINE_SYMBOL = "can define only a symbol"
 ERR_SET_SYMBOL = "can set! only a symbol"
 ERR_ILLEGAL_LAMBDA = "illegal lambda argument list"
+
+PROMPT = "lispy> "
+WELCOME = "Welcome to Lispy!"
+GOODBYE = "Goodbye!"

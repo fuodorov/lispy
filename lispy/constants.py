@@ -6,9 +6,6 @@ FALSE_LITERAL = '#f'
 STRING_QUOTE = '"'
 COMMENT_CHAR = ';'
 
-PROMPT = 'lispy> '
-VERSION_STRING = "Lispy version 2.0\n"
-
 QUOTE_CHAR = "'"
 QUASIQUOTE_CHAR = "`"
 UNQUOTE_CHAR = ","
