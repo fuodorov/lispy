@@ -19,10 +19,8 @@ from .primitives import add_globals
 from .repl import load, parse, repl  # noqa: F401
 from .types import EOF_OBJECT, Atom, Exp, Symbol  # noqa: F401
 
-# Initialize globals
 add_globals(global_env)
 
-# Initialize standard macros
 eval(parse("""(begin
 (define-macro and (lambda args
    (if (null? args) #t

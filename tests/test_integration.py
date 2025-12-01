@@ -4,9 +4,6 @@ import pytest
 
 import lispy
 
-# The user provided a list of tests and expected outputs.
-# I will create a script that runs these tests using lispy.repl or lispy.eval.
-
 tests = [
     ("(quote (testing 1 (2.0) -3.14e159))", "(testing 1 (2.0) -3.14e+159)"),
     ("(+ 2 2)", "4"),
@@ -85,7 +82,7 @@ tests = [
     ("(call/cc (lambda (throw) \n         (+ 5 (* 10 (call/cc (lambda (escape) (* 100 (escape 3))))))))", "35"),
     ("(call/cc (lambda (throw) \n         (+ 5 (* 10 (call/cc (lambda (escape) (* 100 (throw 3))))))))", "3"),
     ("(call/cc (lambda (throw) \n         (+ 5 (* 10 (call/cc (lambda (escape) (* 100 1)))))))", "1005"),
-    ("(* 1i 1i)", "(-1+0i)"),  # Python complex uses j, but lispy converts to i
+    ("(* 1i 1i)", "(-1+0i)"),
     ("(sqrt -1)", "1i"),
     ("(let ((a 1) (b 2)) (+ a b))", "3"),
     ("(let ((a 1) (b 2 3)) (+ a b))", "SchemeSyntaxError: (let ((a 1) (b 2 3)) (+ a b)): illegal binding list"),
@@ -95,7 +92,6 @@ tests = [
     ("(and (> 2 1) (> 2 3))", "#f"),
     ("""(define-macro unless (lambda args `(if (not ,(car args)) (begin ,@(cdr args)))))""", "None"),
     ("(unless (= 2 (+ 1 1)) (display 2) 3 4)", "None"),
-    # 2 printed
     ("(unless (= 4 (+ 1 1)) (display 2) (display \"\\n\") 3 4)", "4"),
     ("(quote x)", "x"),
     ("(quote (1 2 three))", "(1 2 three)"),

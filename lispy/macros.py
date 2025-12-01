@@ -30,7 +30,6 @@ from .types import (
 )
 
 
-# Helper for is_pair since it was in primitives but needed here for expand_quasiquote
 def is_pair(x: Exp) -> bool:
     return x != [] and isinstance(x, list)
 
