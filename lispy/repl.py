@@ -2,6 +2,7 @@ import io
 import sys
 from typing import Optional, TextIO, Union
 
+from .constants import PROMPT, VERSION_STRING
 from .errors import LispyError
 from .evaluator import eval
 from .macros import expand
@@ -34,7 +35,7 @@ def load(filename: str) -> None:
     repl(None, InPort(open(filename)), None)
 
 
-def repl(prompt: str = 'lispy> ', inport: Optional[InPort] = None, out: Optional[TextIO] = sys.stdout) -> None:
+def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[TextIO] = sys.stdout) -> None:
     """
     A prompt-read-eval-print loop.
 
@@ -45,7 +46,7 @@ def repl(prompt: str = 'lispy> ', inport: Optional[InPort] = None, out: Optional
     """
     if inport is None:
         inport = InPort(sys.stdin)
-    sys.stderr.write("Lispy version 2.0\n")
+    sys.stderr.write(VERSION_STRING)
     while True:
         try:
             if prompt:

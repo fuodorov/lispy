@@ -1,0 +1,9 @@
+# Error messages
+ERR_WRONG_LENGTH = "wrong length"
+ERR_CANT_SPLICE = "can't splice here"
+ERR_ILLEGAL_BINDING = "illegal binding list"
+ERR_DEFINE_MACRO_TOPLEVEL = "define-macro only allowed at top level"
+ERR_MACRO_PROCEDURE = "macro must be a procedure"
+ERR_DEFINE_SYMBOL = "can define only a symbol"
+ERR_SET_SYMBOL = "can set! only a symbol"
+ERR_ILLEGAL_LAMBDA = "illegal lambda argument list"

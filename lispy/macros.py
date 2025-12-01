@@ -1,5 +1,15 @@
 from .errors import SchemeSyntaxError
 from .evaluator import eval
+from .messages import (
+    ERR_CANT_SPLICE,
+    ERR_DEFINE_MACRO_TOPLEVEL,
+    ERR_DEFINE_SYMBOL,
+    ERR_ILLEGAL_BINDING,
+    ERR_ILLEGAL_LAMBDA,
+    ERR_MACRO_PROCEDURE,
+    ERR_SET_SYMBOL,
+    ERR_WRONG_LENGTH,
+)
 from .parser import to_string
 from .types import (
     Exp,
@@ -25,7 +35,7 @@ def is_pair(x: Exp) -> bool:
     return x != [] and isinstance(x, list)
 
 
-def require(x: Exp, predicate: bool, msg: str = "wrong length") -> None:
+def require(x: Exp, predicate: bool, msg: str = ERR_WRONG_LENGTH) -> None:
     """
     Signal a syntax error if predicate is false.
 
@@ -73,7 +83,7 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
     elif op is _set:
         require(x, len(x) == 3)
         var = x[1]                      # (set! non-var exp) => Error
-        require(x, isinstance(var, Symbol), "can set! only a symbol")
+        require(x, isinstance(var, Symbol), ERR_SET_SYMBOL)
         return [_set, var, expand(x[2])]
     elif op is _define or op is _definemacro:
         require(x, len(x) >= 3)
@@ -83,12 +93,12 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
             return expand([_def, f, [_lambda, args] + body])
         else:
             require(x, len(x) == 3)     # (define non-var/list exp) => Error
-            require(x, isinstance(v, Symbol), "can define only a symbol")
+            require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
             exp = expand(x[2])
             if _def is _definemacro:
-                require(x, toplevel, "define-macro only allowed at top level")
+                require(x, toplevel, ERR_DEFINE_MACRO_TOPLEVEL)
                 proc = eval(exp)
-                require(x, callable(proc), "macro must be a procedure")
+                require(x, callable(proc), ERR_MACRO_PROCEDURE)
                 macro_table[v] = proc   # (define-macro v proc)
                 return None             # => None; add v:proc to macro_table
             return [_define, v, exp]
@@ -101,7 +111,7 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
         require(x, len(x) >= 3)         # => (lambda (x) (begin e1 e2))
         vars, body = x[1], x[2:]
         require(x, (isinstance(vars, list) and all(isinstance(v, Symbol) for v in vars))
-                or isinstance(vars, Symbol), "illegal lambda argument list")
+                or isinstance(vars, Symbol), ERR_ILLEGAL_LAMBDA)
         exp = body[0] if len(body) == 1 else [_begin] + body
         return [_lambda, vars, expand(exp)]
     elif op is _quasiquote:             # `x => expand_quasiquote(x)
@@ -127,7 +137,7 @@ def expand_quasiquote(x: Exp) -> Exp:
     """
     if not is_pair(x):
         return [_quote, x]
-    require(x, x[0] is not _unquotesplicing, "can't splice here")
+    require(x, x[0] is not _unquotesplicing, ERR_CANT_SPLICE)
     if x[0] is _unquote:
         require(x, len(x) == 2)
         return x[1]
@@ -155,7 +165,7 @@ def let(*args: Exp) -> Exp:
     require(x, len(args) > 1)
     bindings, body = args[0], args[1:]
     require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
-                   for b in bindings), "illegal binding list")
+                   for b in bindings), ERR_ILLEGAL_BINDING)
     vars, vals = zip(*bindings)
     return [[_lambda, list(vars)] + list(map(expand, body))] + list(map(expand, vals))
 

@@ -21,7 +21,9 @@
 lispy/
     __init__.py    # Инициализация пакета
     types.py       # Типы данных (Symbol, Exp, Atom)
+    constants.py   # Константы
     errors.py      # Классы исключений
+    messages.py    # Сообщения
     parser.py      # Токенизатор и парсер
     env.py         # Окружение (Environment)
     evaluator.py   # Вычислитель (eval)

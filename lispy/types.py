@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Union
 
+from .constants import QUASIQUOTE_CHAR, QUOTE_CHAR, UNQUOTE_CHAR, UNQUOTE_SPLICING_CHAR
+
 Symbol = str
 Number = Union[int, float]
 Atom = Union[Symbol, Number]
@@ -53,8 +55,8 @@ _let = get_symbol('let')
 EOF_OBJECT = get_symbol('#<eof-object>')
 
 QUOTES = {
-    "'": _quote,
-    "`": _quasiquote,
-    ",": _unquote,
-    ",@": _unquotesplicing
+    QUOTE_CHAR: _quote,
+    QUASIQUOTE_CHAR: _quasiquote,
+    UNQUOTE_CHAR: _unquote,
+    UNQUOTE_SPLICING_CHAR: _unquotesplicing
 }

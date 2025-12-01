@@ -14,7 +14,17 @@ Lispy Modules
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: lispy.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. automodule:: lispy.errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: lispy.messages
    :members:
    :undoc-members:
    :show-inheritance:

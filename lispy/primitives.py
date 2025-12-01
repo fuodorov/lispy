@@ -5,6 +5,7 @@ import operator as op
 import sys
 from typing import Any, Callable
 
+from .constants import FILE_WRITE_MODE
 from .env import Env
 from .evaluator import eval
 from .macros import expand
@@ -90,7 +91,7 @@ def add_globals(env: Env) -> Env:
         'port?': lambda x: isinstance(x, io.IOBase), 'apply': lambda proc, lst: proc(*lst),
         'eval': lambda x: eval(expand(x)), 'load': lambda fn: load(fn), 'call/cc': callcc,
         'open-input-file': open, 'close-input-port': lambda p: p.file.close(),
-        'open-output-file': lambda f: open(f, 'w'), 'close-output-port': lambda p: p.close(),
+        'open-output-file': lambda f: open(f, FILE_WRITE_MODE), 'close-output-port': lambda p: p.close(),
         'eof-object?': lambda x: x is EOF_OBJECT, 'read-char': readchar,
         'read': read, 'write': lambda x, port=sys.stdout: port.write(to_string(x)),
         'display': lambda x, port=sys.stdout: port.write(x if isinstance(x, str) else to_string(x))
