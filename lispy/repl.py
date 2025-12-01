@@ -2,10 +2,10 @@ import io
 import sys
 from typing import Optional, TextIO, Union
 
-from .messages import PROMPT, WELCOME, GOODBYE
 from .errors import LispyError
 from .evaluator import eval
 from .macros import expand
+from .messages import GOODBYE, PROMPT, WELCOME
 from .parser import InPort, read, to_string
 from .types import EOF_OBJECT, Exp
 
