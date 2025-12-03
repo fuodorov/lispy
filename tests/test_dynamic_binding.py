@@ -1,0 +1,63 @@
+import lispy
+
+
+def test_dynamic_let_global():
+    # Define a global variable
+    lispy.eval(lispy.parse("(define *x* 10)"))
+
+    # Define a function that uses it
+    lispy.eval(lispy.parse("(define (read-x) *x*)"))
+
+    # Check initial value
+    assert lispy.eval(lispy.parse("(read-x)")) == 10
+
+    # Use dynamic-let to change it temporarily
+    res = lispy.eval(lispy.parse("(dynamic-let ((*x* 20)) (read-x))"))
+    assert res == 20
+
+    # Check it is restored
+    assert lispy.eval(lispy.parse("(read-x)")) == 10
+
+
+def test_dynamic_let_nested():
+    lispy.eval(lispy.parse("(define *y* 1)"))
+    lispy.eval(lispy.parse("(define (read-y) *y*)"))
+
+    code = """
+    (dynamic-let ((*y* 2))
+        (list (read-y)
+              (dynamic-let ((*y* 3))
+                  (read-y))
+              (read-y)))
+    """
+    res = lispy.eval(lispy.parse(code))
+    # Should be (2 3 2)
+    # (read-y) -> 2
+    # inner (read-y) -> 3
+    # (read-y) -> 2
+
+    # Convert python list to check
+    assert res == [2, 3, 2]
+
+    # Check restored
+    assert lispy.eval(lispy.parse("(read-y)")) == 1
+
+
+def test_dynamic_let_exception():
+    lispy.eval(lispy.parse("(define *z* 100)"))
+
+    code = """
+    (try
+        (dynamic-let ((*z* 200))
+            (raise "error"))
+        (lambda (e) *z*))
+    """
+    # If dynamic-let restores correctly in finally block,
+    # then when we catch the error outside, *z* should be restored to 100?
+    # Wait. The catch handler is executed... where?
+    # In the environment of the try?
+    # The try is outside dynamic-let.
+    # So dynamic-let should have finished (abruptly) and restored *z*.
+
+    res = lispy.eval(lispy.parse(code))
+    assert res == 100

@@ -19,12 +19,14 @@ from .types import (
     _cons,
     _define,
     _definemacro,
+    _dynamic_let,
     _if,
     _lambda,
     _let,
     _quasiquote,
     _quote,
     _set,
+    _try,
     _unquote,
     _unquotesplicing,
 )
@@ -116,6 +118,17 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
     elif op is _quasiquote:             # `x => expand_quasiquote(x)
         require(x, len(x) == 2)
         return expand_quasiquote(x[1])
+    elif op is _try:
+        require(x, len(x) == 3)
+        return [_try, expand(x[1], toplevel), expand(x[2], toplevel)]
+    elif op is _dynamic_let:
+        require(x, len(x) >= 3)
+        bindings, body = x[1], x[2:]
+        require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
+                       for b in bindings), ERR_ILLEGAL_BINDING)
+        expanded_bindings = [[b[0], expand(b[1], toplevel)] for b in bindings]
+        expanded_body = [expand(e, toplevel) for e in body]
+        return [_dynamic_let, expanded_bindings] + expanded_body
     elif isinstance(op, Symbol) and op in macro_table:
         return expand(macro_table[op](*x[1:]), toplevel)  # (m arg...)
     else:                               # => macroexpand if m isa macro

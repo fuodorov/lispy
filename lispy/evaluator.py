@@ -1,7 +1,7 @@
 from typing import Any, List, Optional
 
 from .env import Env, global_env
-from .types import Exp, Symbol, _begin, _define, _if, _lambda, _quote, _set, _try
+from .types import Exp, Symbol, _begin, _define, _dynamic_let, _if, _lambda, _quote, _set, _try
 
 
 class Procedure:
@@ -93,6 +93,32 @@ def eval(x: Exp, env: Optional[Env] = None) -> Any:
                     env = Env(proc.parms, [e], proc.env)
                 else:
                     return proc(e)
+        elif op is _dynamic_let:        # (dynamic-let ((var exp)...) body...)
+            (_, bindings, *body) = x
+            vars_list = [b[0] for b in bindings]
+            exps = [b[1] for b in bindings]
+            vals = [eval(e, env) for e in exps]
+
+            old_vals = []
+            # Save old values
+            for v in vars_list:
+                target_env = env.find(v)
+                old_vals.append((target_env, v, target_env[v]))
+
+            # Apply new values
+            for i, v in enumerate(vars_list):
+                target_env = env.find(v)
+                target_env[v] = vals[i]
+
+            try:
+                result = None
+                for expr in body:
+                    result = eval(expr, env)
+                return result
+            finally:
+                # Restore old values
+                for target_env, v, old_val in old_vals:
+                    target_env[v] = old_val
         else:                           # (proc exp*)
             exps = [eval(exp, env) for exp in x]
             proc = exps.pop(0)
