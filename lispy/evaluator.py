@@ -1,7 +1,7 @@
 from typing import Any, List, Optional
 
 from .env import Env, global_env
-from .types import Exp, Symbol, _begin, _define, _if, _lambda, _quote, _set
+from .types import Exp, Symbol, _begin, _define, _if, _lambda, _quote, _set, _try
 
 
 class Procedure:
@@ -82,6 +82,17 @@ def eval(x: Exp, env: Optional[Env] = None) -> Any:
             for exp in x[1:-1]:
                 eval(exp, env)
             x = x[-1]
+        elif op is _try:                # (try exp handler)
+            (_, exp, handler) = x
+            try:
+                return eval(exp, env)
+            except Exception as e:
+                proc = eval(handler, env)
+                if isinstance(proc, Procedure):
+                    x = proc.exp
+                    env = Env(proc.parms, [e], proc.env)
+                else:
+                    return proc(e)
         else:                           # (proc exp*)
             exps = [eval(exp, env) for exp in x]
             proc = exps.pop(0)

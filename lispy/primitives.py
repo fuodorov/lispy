@@ -68,6 +68,22 @@ def cons(x: Any, y: ListType) -> ListType:
     return [x] + list(y)
 
 
+def raise_error(x: Any) -> None:
+    """
+    Raise an exception.
+
+    Args:
+        x (Any): The exception object or message to raise.
+
+    Raises:
+        Exception: The provided exception or a new Exception with the message.
+    """
+    if isinstance(x, Exception):
+        raise x
+    else:
+        raise Exception(to_string(x))
+
+
 def add_globals(env: Env) -> Env:
     """
     Add some Scheme standard procedures to the environment.
@@ -94,6 +110,8 @@ def add_globals(env: Env) -> Env:
         'open-output-file': lambda f: open(f, FILE_WRITE_MODE), 'close-output-port': lambda p: p.close(),
         'eof-object?': lambda x: x is EOF_OBJECT, 'read-char': readchar,
         'read': read, 'write': lambda x, port=sys.stdout: port.write(to_string(x)),
-        'display': lambda x, port=sys.stdout: port.write(x if isinstance(x, str) else to_string(x))
+        'display': lambda x, port=sys.stdout: port.write(x if isinstance(x, str) else to_string(x)),
+        'raise': raise_error,
+        'str': str
     })
     return env

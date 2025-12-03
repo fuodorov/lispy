@@ -51,6 +51,7 @@ _unquotesplicing = get_symbol('unquote-splicing')
 _append = get_symbol('append')
 _cons = get_symbol('cons')
 _let = get_symbol('let')
+_try = get_symbol('try')
 
 EOF_OBJECT = get_symbol('#<eof-object>')
 
