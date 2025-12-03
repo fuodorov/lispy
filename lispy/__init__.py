@@ -29,3 +29,12 @@ eval(parse("""(begin
        (if (= (length args) 1) (car args)
            `(if ,(car args) (and ,@(cdr args)) #f)))))
 )"""))
+
+# Define 'or' macro in the global environment
+eval(parse("""(begin
+(define-macro or (lambda args
+   (if (null? args) #f
+       (if (= (length args) 1) (car args)
+           `(let ((__or_temp__ ,(car args)))
+              (if __or_temp__ __or_temp__ (or ,@(cdr args))))))))
+)"""))
