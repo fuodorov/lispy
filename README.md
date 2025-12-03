@@ -20,21 +20,24 @@
 
 ```
 lispy/
-    __init__.py    # Инициализация пакета
+    __init__.py    # Инициализация пакета, определение встроенных макросов
+    __main__.py    # Точка входа (python -m lispy)
     types.py       # Типы данных (Symbol, Exp, Atom)
-    constants.py   # Константы
+    constants.py   # Константы и настройки
     errors.py      # Классы исключений
-    messages.py    # Сообщения
-    parser.py      # Токенизатор и парсер
+    messages.py    # Тексты сообщений об ошибках
+    parser.py      # Токенизатор и парсер (read)
     env.py         # Окружение (Environment)
-    evaluator.py   # Вычислитель (eval)
-    macros.py      # Система макросов
+    evaluator.py   # Вычислитель (eval), поддержка TCO, try, dynamic-let
+    macros.py      # Система макросов (expand)
     primitives.py  # Стандартная библиотека функций
     repl.py        # Read-Eval-Print Loop
 tests/
-    test_integration.py # Интеграционные тесты
-    test_parser.py      # Юнит-тесты парсера
-    test_env.py         # Юнит-тесты окружения
+    test_integration.py    # Интеграционные тесты
+    test_parser.py         # Юнит-тесты парсера
+    test_env.py            # Юнит-тесты окружения
+    test_try_catch.py      # Тесты обработки исключений
+    test_dynamic_binding.py # Тесты динамического связывания
 ```
 
 ## Установка и запуск
