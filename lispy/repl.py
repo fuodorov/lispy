@@ -46,14 +46,12 @@ def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[Te
     """
     if inport is None:
         inport = InPort(sys.stdin)
-    # Informational messages to the same stream as prompt/output for consistency
-    if out:
-        out.write(WELCOME + '\n')
+    sys.stderr.write(WELCOME + '\n')
     while True:
         try:
-            if prompt and out:
-                out.write(prompt)
-                out.flush()
+            if prompt:
+                sys.stderr.write(prompt)
+                sys.stderr.flush()
             x = parse(inport)
             if x is EOF_OBJECT:
                 sys.stderr.write(GOODBYE + '\n')
@@ -62,9 +60,9 @@ def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[Te
             if val is not None and out:
                 print(to_string(val), file=out)
         except LispyError as e:
-            print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
+            print('%s: %s' % (type(e).__name__, e))
         except Exception as e:
-            print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
+            print('%s: %s' % (type(e).__name__, e))
 
 
 if __name__ == '__main__':
