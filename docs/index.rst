@@ -7,6 +7,7 @@ Welcome to Lispy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   architecture
    modules
 
 Indices and tables
