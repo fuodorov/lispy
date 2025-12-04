@@ -52,6 +52,94 @@ def require(x: Exp, predicate: bool, msg: str = ERR_WRONG_LENGTH) -> None:
         raise SchemeSyntaxError(to_string(x) + ': ' + msg)
 
 
+def expand_quote(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) == 2)
+    return x
+
+
+def expand_if(x: Exp, toplevel: bool) -> Exp:
+    if len(x) == 3:
+        x = x + [None]
+    require(x, len(x) == 4)
+    return list(map(expand, x))
+
+
+def expand_set(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) == 3)
+    var = x[1]
+    require(x, isinstance(var, Symbol), ERR_SET_SYMBOL)
+    return [_set, var, expand(x[2])]
+
+
+def expand_define(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) >= 3)
+    _def, v, body = x[0], x[1], x[2:]
+    if isinstance(v, list) and v:
+        f, args = v[0], v[1:]
+        return expand([_def, f, [_lambda, args] + body])
+    else:
+        require(x, len(x) == 3)
+        require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
+        exp = expand(x[2])
+        if _def is _definemacro:
+            require(x, toplevel, ERR_DEFINE_MACRO_TOPLEVEL)
+            proc = eval(exp)
+            require(x, callable(proc), ERR_MACRO_PROCEDURE)
+            macro_table[v] = proc
+            return None
+        return [_define, v, exp]
+
+
+def expand_begin(x: Exp, toplevel: bool) -> Exp:
+    if len(x) == 1:
+        return None
+    else:
+        return [expand(xi, toplevel) for xi in x]
+
+
+def expand_lambda(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) >= 3)
+    vars, body = x[1], x[2:]
+    require(x, (isinstance(vars, list) and all(isinstance(v, Symbol) for v in vars))
+            or isinstance(vars, Symbol), ERR_ILLEGAL_LAMBDA)
+    exp = body[0] if len(body) == 1 else [_begin] + body
+    return [_lambda, vars, expand(exp)]
+
+
+def expand_quasiquote_macro(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) == 2)
+    return expand_quasiquote(x[1])
+
+
+def expand_try(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) == 3)
+    return [_try, expand(x[1], toplevel), expand(x[2], toplevel)]
+
+
+def expand_dynamic_let(x: Exp, toplevel: bool) -> Exp:
+    require(x, len(x) >= 3)
+    bindings, body = x[1], x[2:]
+    require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
+                   for b in bindings), ERR_ILLEGAL_BINDING)
+    expanded_bindings = [[b[0], expand(b[1], toplevel)] for b in bindings]
+    expanded_body = [expand(e, toplevel) for e in body]
+    return [_dynamic_let, expanded_bindings] + expanded_body
+
+
+SPECIAL_FORMS = {
+    _quote: expand_quote,
+    _if: expand_if,
+    _set: expand_set,
+    _define: expand_define,
+    _definemacro: expand_define,
+    _begin: expand_begin,
+    _lambda: expand_lambda,
+    _quasiquote: expand_quasiquote_macro,
+    _try: expand_try,
+    _dynamic_let: expand_dynamic_let,
+}
+
+
 def expand(x: Exp, toplevel: bool = False) -> Exp:
     """
     Walk tree of x, making optimizations/fixes, and signaling SchemeSyntaxError.
@@ -73,62 +161,8 @@ def expand(x: Exp, toplevel: bool = False) -> Exp:
         return x
 
     op = x[0]
-    if op is _quote:                    # (quote exp)
-        require(x, len(x) == 2)
-        return x
-    elif op is _if:
-        if len(x) == 3:
-            x = x + [None]              # (if t c) => (if t c None)
-        require(x, len(x) == 4)
-        return list(map(expand, x))
-    elif op is _set:
-        require(x, len(x) == 3)
-        var = x[1]                      # (set! non-var exp) => Error
-        require(x, isinstance(var, Symbol), ERR_SET_SYMBOL)
-        return [_set, var, expand(x[2])]
-    elif op is _define or op is _definemacro:
-        require(x, len(x) >= 3)
-        _def, v, body = x[0], x[1], x[2:]
-        if isinstance(v, list) and v:   # (define (f args) body)
-            f, args = v[0], v[1:]       # => (define f (lambda (args) body))
-            return expand([_def, f, [_lambda, args] + body])
-        else:
-            require(x, len(x) == 3)     # (define non-var/list exp) => Error
-            require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
-            exp = expand(x[2])
-            if _def is _definemacro:
-                require(x, toplevel, ERR_DEFINE_MACRO_TOPLEVEL)
-                proc = eval(exp)
-                require(x, callable(proc), ERR_MACRO_PROCEDURE)
-                macro_table[v] = proc   # (define-macro v proc)
-                return None             # => None; add v:proc to macro_table
-            return [_define, v, exp]
-    elif op is _begin:
-        if len(x) == 1:
-            return None                 # (begin) => None
-        else:
-            return [expand(xi, toplevel) for xi in x]
-    elif op is _lambda:                 # (lambda (x) e1 e2)
-        require(x, len(x) >= 3)         # => (lambda (x) (begin e1 e2))
-        vars, body = x[1], x[2:]
-        require(x, (isinstance(vars, list) and all(isinstance(v, Symbol) for v in vars))
-                or isinstance(vars, Symbol), ERR_ILLEGAL_LAMBDA)
-        exp = body[0] if len(body) == 1 else [_begin] + body
-        return [_lambda, vars, expand(exp)]
-    elif op is _quasiquote:             # `x => expand_quasiquote(x)
-        require(x, len(x) == 2)
-        return expand_quasiquote(x[1])
-    elif op is _try:
-        require(x, len(x) == 3)
-        return [_try, expand(x[1], toplevel), expand(x[2], toplevel)]
-    elif op is _dynamic_let:
-        require(x, len(x) >= 3)
-        bindings, body = x[1], x[2:]
-        require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
-                       for b in bindings), ERR_ILLEGAL_BINDING)
-        expanded_bindings = [[b[0], expand(b[1], toplevel)] for b in bindings]
-        expanded_body = [expand(e, toplevel) for e in body]
-        return [_dynamic_let, expanded_bindings] + expanded_body
+    if isinstance(op, Symbol) and op in SPECIAL_FORMS:
+        return SPECIAL_FORMS[op](x, toplevel)
     elif isinstance(op, Symbol) and op in macro_table:
         return expand(macro_table[op](*x[1:]), toplevel)  # (m arg...)
     else:                               # => macroexpand if m isa macro

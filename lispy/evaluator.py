@@ -37,6 +37,102 @@ class Procedure:
         return eval(self.exp, Env(self.parms, args, self.env))
 
 
+class TailCall:
+    """
+    Represents a tail call to be executed by the evaluator loop.
+    """
+    def __init__(self, x: Exp, env: Env) -> None:
+        self.x = x
+        self.env = env
+
+
+def eval_quote(x: Exp, env: Env) -> Any:
+    return x[1]
+
+
+def eval_if(x: Exp, env: Env) -> Any:
+    (_, test, conseq, alt) = x
+    if eval(test, env):
+        return TailCall(conseq, env)
+    else:
+        return TailCall(alt, env)
+
+
+def eval_set(x: Exp, env: Env) -> Any:
+    (_, var, exp) = x
+    env.find(var)[var] = eval(exp, env)
+    return None
+
+
+def eval_define(x: Exp, env: Env) -> Any:
+    (_, var, exp) = x
+    env[var] = eval(exp, env)
+    return None
+
+
+def eval_lambda(x: Exp, env: Env) -> Any:
+    (_, vars, exp) = x
+    return Procedure(vars, exp, env)
+
+
+def eval_begin(x: Exp, env: Env) -> Any:
+    for exp in x[1:-1]:
+        eval(exp, env)
+    return TailCall(x[-1], env)
+
+
+def eval_try(x: Exp, env: Env) -> Any:
+    (_, exp, handler) = x
+    try:
+        return eval(exp, env)
+    except Exception as e:
+        proc = eval(handler, env)
+        if isinstance(proc, Procedure):
+            return TailCall(proc.exp, Env(proc.parms, [e], proc.env))
+        else:
+            return proc(e)
+
+
+def eval_dynamic_let(x: Exp, env: Env) -> Any:
+    (_, bindings, *body) = x
+    vars_list = [b[0] for b in bindings]
+    exps = [b[1] for b in bindings]
+    vals = [eval(e, env) for e in exps]
+
+    old_vals = []
+    # Save old values
+    for v in vars_list:
+        target_env = env.find(v)
+        old_vals.append((target_env, v, target_env[v]))
+
+    # Apply new values
+    for i, v in enumerate(vars_list):
+        target_env = env.find(v)
+        target_env[v] = vals[i]
+
+    try:
+        result = None
+        for expr in body:
+            result = eval(expr, env)
+        return result
+    finally:
+        # Restore old values
+        for target_env, v, old_val in old_vals:
+            target_env[v] = old_val
+
+
+SPECIAL_FORMS = {
+    _quote: eval_quote,
+    _if: eval_if,
+    _set: eval_set,
+    _define: eval_define,
+    _lambda: eval_lambda,
+    _begin: eval_begin,
+    _try: eval_try,
+    _dynamic_let: eval_dynamic_let,
+}
+
+
 def eval(x: Exp, env: Optional[Env] = None) -> Any:
     """
     Evaluate an expression in an environment.
@@ -62,63 +158,12 @@ def eval(x: Exp, env: Optional[Env] = None) -> Any:
             return x
 
         op = x[0]
-        if op is _quote:                # (quote exp)
-            return x[1]
-        elif op is _if:                 # (if test conseq alt)
-            (_, test, conseq, alt) = x
-            x = (conseq if eval(test, env) else alt)
-        elif op is _set:                # (set! var exp)
-            (_, var, exp) = x
-            env.find(var)[var] = eval(exp, env)
-            return None
-        elif op is _define:             # (define var exp)
-            (_, var, exp) = x
-            env[var] = eval(exp, env)
-            return None
-        elif op is _lambda:             # (lambda (var*) exp)
-            (_, vars, exp) = x
-            return Procedure(vars, exp, env)
-        elif op is _begin:              # (begin exp+)
-            for exp in x[1:-1]:
-                eval(exp, env)
-            x = x[-1]
-        elif op is _try:                # (try exp handler)
-            (_, exp, handler) = x
-            try:
-                return eval(exp, env)
-            except Exception as e:
-                proc = eval(handler, env)
-                if isinstance(proc, Procedure):
-                    x = proc.exp
-                    env = Env(proc.parms, [e], proc.env)
-                else:
-                    return proc(e)
-        elif op is _dynamic_let:        # (dynamic-let ((var exp)...) body...)
-            (_, bindings, *body) = x
-            vars_list = [b[0] for b in bindings]
-            exps = [b[1] for b in bindings]
-            vals = [eval(e, env) for e in exps]
-
-            old_vals = []
-            # Save old values
-            for v in vars_list:
-                target_env = env.find(v)
-                old_vals.append((target_env, v, target_env[v]))
-
-            # Apply new values
-            for i, v in enumerate(vars_list):
-                target_env = env.find(v)
-                target_env[v] = vals[i]
-
-            try:
-                result = None
-                for expr in body:
-                    result = eval(expr, env)
-                return result
-            finally:
-                # Restore old values
-                for target_env, v, old_val in old_vals:
-                    target_env[v] = old_val
+        if isinstance(op, Symbol) and op in SPECIAL_FORMS:
+            res = SPECIAL_FORMS[op](x, env)
+            if isinstance(res, TailCall):
+                x, env = res.x, res.env
+                continue
+            return res
         else:                           # (proc exp*)
             exps = [eval(exp, env) for exp in x]
             proc = exps.pop(0)
