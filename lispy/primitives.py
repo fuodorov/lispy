@@ -5,6 +5,7 @@ This module defines the standard Scheme procedures available in the global
 environment, such as arithmetic operations, list manipulation, and I/O.
 """
 import cmath
+import functools
 import io
 import math
 import operator as op
@@ -110,10 +111,16 @@ def add_globals(env: Env) -> Env:
     env.update(vars(math))
     env.update(vars(cmath))
     env.update({
-        '+': op.add, '-': op.sub, '*': op.mul, '/': op.truediv, 'not': op.not_,
+        '+': lambda *x: sum(x),
+        '-': lambda x, *y: x - sum(y) if y else -x,
+        '*': lambda *x: functools.reduce(op.mul, x, 1),
+        '/': lambda x, *y: functools.reduce(op.truediv, y, x) if y else 1 / x,
+        'string-append': lambda *x: "".join(map(str, x)),
+        'not': op.not_,
         '>': op.gt, '<': op.lt, '>=': op.ge, '<=': op.le, '=': op.eq,
         'equal?': op.eq, 'eq?': op.is_, 'length': len, 'cons': cons,
-        'car': lambda x: x[0], 'cdr': lambda x: x[1:], 'append': op.add,
+        'car': lambda x: x[0], 'cdr': lambda x: x[1:],
+        'append': lambda *x: functools.reduce(op.add, x, []),
         'list': lambda *x: list(x), 'list?': lambda x: isinstance(x, list),
         'null?': lambda x: x == [], 'symbol?': lambda x: isinstance(x, Symbol),
         'boolean?': lambda x: isinstance(x, bool), 'pair?': is_pair,
