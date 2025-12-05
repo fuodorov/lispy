@@ -4,6 +4,10 @@
 
 Компактный интерпретатор Scheme (Lisp), написанный на Python.
 
+## Демонстрация
+
+[![asciicast](https://asciinema.org/a/rlPyQhtRVw6U9nkOpFjloZ1Ap.svg)](https://asciinema.org/a/rlPyQhtRVw6U9nkOpFjloZ1Ap)
+
 ## Возможности
 
 - **Ядро Scheme**: Поддержка лямбда-исчисления, лексических областей видимости (closures), `define`, `set!`, `if`, `quote`.
