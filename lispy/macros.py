@@ -131,7 +131,7 @@ def expand_define(x: Exp, toplevel: bool) -> Exp:
     _def, v, body = x[0], x[1], x[2:]
     if isinstance(v, list) and v:
         f, args = v[0], v[1:]
-        return expand([_def, f, [_lambda, args] + body])
+        return expand([_def, f, [_lambda, args] + body], toplevel)
     else:
         require(x, len(x) == 3)
         require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
