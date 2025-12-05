@@ -1,3 +1,9 @@
+"""
+Parser module.
+
+This module handles the tokenization and parsing of Scheme source code into
+Abstract Syntax Trees (ASTs).
+"""
 import re
 from typing import Optional, TextIO
 
@@ -85,6 +91,15 @@ def read(inport: InPort) -> Exp:
         ParseError: If the syntax is invalid (e.g., unexpected EOF or parenthesis).
     """
     def read_ahead(token: str) -> Exp:
+        """
+        Helper function to read ahead recursively.
+
+        Args:
+            token (str): The current token.
+
+        Returns:
+            Exp: The parsed expression.
+        """
         if LPAREN == token:
             L = []
             while True:

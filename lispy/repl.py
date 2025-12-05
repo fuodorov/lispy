@@ -1,3 +1,8 @@
+"""
+Read-Eval-Print Loop (REPL) module.
+
+This module implements the interactive shell and file loading functionality.
+"""
 import io
 import sys
 from typing import Optional, TextIO, Union

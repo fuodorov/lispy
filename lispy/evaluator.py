@@ -1,3 +1,10 @@
+"""
+Evaluator module for Lispy.
+
+This module contains the core evaluation logic, including the `eval` function
+and handlers for special forms. It implements Tail Call Optimization (TCO)
+using the `TailCall` class.
+"""
 from typing import Any, List, Optional
 
 from .env import Env, global_env
@@ -42,15 +49,42 @@ class TailCall:
     Represents a tail call to be executed by the evaluator loop.
     """
     def __init__(self, x: Exp, env: Env) -> None:
+        """
+        Initialize the TailCall.
+
+        Args:
+            x (Exp): The expression to evaluate.
+            env (Env): The environment to evaluate in.
+        """
         self.x = x
         self.env = env
 
 
 def eval_quote(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a quote expression.
+
+    Args:
+        x (Exp): The expression (quote exp).
+        env (Env): The environment (unused).
+
+    Returns:
+        Any: The quoted expression.
+    """
     return x[1]
 
 
 def eval_if(x: Exp, env: Env) -> Any:
+    """
+    Evaluate an if expression.
+
+    Args:
+        x (Exp): The expression (if test conseq alt).
+        env (Env): The environment.
+
+    Returns:
+        Any: The result of the consequent or alternative, wrapped in TailCall.
+    """
     (_, test, conseq, alt) = x
     if eval(test, env):
         return TailCall(conseq, env)
@@ -59,29 +93,79 @@ def eval_if(x: Exp, env: Env) -> Any:
 
 
 def eval_set(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a set! expression.
+
+    Args:
+        x (Exp): The expression (set! var exp).
+        env (Env): The environment.
+
+    Returns:
+        Any: None.
+    """
     (_, var, exp) = x
     env.find(var)[var] = eval(exp, env)
     return None
 
 
 def eval_define(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a define expression.
+
+    Args:
+        x (Exp): The expression (define var exp).
+        env (Env): The environment.
+
+    Returns:
+        Any: None.
+    """
     (_, var, exp) = x
     env[var] = eval(exp, env)
     return None
 
 
 def eval_lambda(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a lambda expression.
+
+    Args:
+        x (Exp): The expression (lambda vars body).
+        env (Env): The environment.
+
+    Returns:
+        Procedure: The created procedure.
+    """
     (_, vars, exp) = x
     return Procedure(vars, exp, env)
 
 
 def eval_begin(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a begin expression.
+
+    Args:
+        x (Exp): The expression (begin exp...).
+        env (Env): The environment.
+
+    Returns:
+        Any: The result of the last expression, wrapped in TailCall.
+    """
     for exp in x[1:-1]:
         eval(exp, env)
     return TailCall(x[-1], env)
 
 
 def eval_try(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a try expression.
+
+    Args:
+        x (Exp): The expression (try exp handler).
+        env (Env): The environment.
+
+    Returns:
+        Any: The result of the expression or the handler.
+    """
     (_, exp, handler) = x
     try:
         return eval(exp, env)
@@ -94,6 +178,16 @@ def eval_try(x: Exp, env: Env) -> Any:
 
 
 def eval_dynamic_let(x: Exp, env: Env) -> Any:
+    """
+    Evaluate a dynamic-let expression.
+
+    Args:
+        x (Exp): The expression (dynamic-let ((var val)...) body...).
+        env (Env): The environment.
+
+    Returns:
+        Any: The result of the body evaluation.
+    """
     (_, bindings, *body) = x
     vars_list = [b[0] for b in bindings]
     exps = [b[1] for b in bindings]

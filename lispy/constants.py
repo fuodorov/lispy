@@ -1,3 +1,6 @@
+"""
+Constants used throughout the Lispy interpreter.
+"""
 TOKENIZER_REGEX = r'''\s*(,@|[('`,)]|"(?:[\\].|[^\\"])*"|;.*|[^\s('"`,;)]*)(.*)'''
 LPAREN = '('
 RPAREN = ')'

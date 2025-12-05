@@ -1,3 +1,9 @@
+"""
+Environment module.
+
+This module defines the `Env` class, which represents the execution environment
+(scope) for variables.
+"""
 from typing import List, Optional, Union
 
 from .errors import ArgumentError, SymbolNotFoundError

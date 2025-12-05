@@ -1,3 +1,8 @@
+"""
+Exception classes for Lispy.
+"""
+
+
 class LispyError(Exception):
     """
     Base class for all Lispy exceptions.
@@ -11,6 +16,12 @@ class Continuation(BaseException):
     by standard 'try' blocks which catch Exception.
     """
     def __init__(self, retval=None):
+        """
+        Initialize the Continuation.
+
+        Args:
+            retval (Any, optional): The return value. Defaults to None.
+        """
         self.retval = retval
 
 

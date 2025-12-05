@@ -1,3 +1,6 @@
+"""
+Error messages and constants for Lispy.
+"""
 ERR_WRONG_LENGTH = "wrong length"
 ERR_CANT_SPLICE = "can't splice here"
 ERR_ILLEGAL_BINDING = "illegal binding list"

@@ -1,3 +1,9 @@
+"""
+Standard library primitives.
+
+This module defines the standard Scheme procedures available in the global
+environment, such as arithmetic operations, list manipulation, and I/O.
+"""
 import cmath
 import io
 import math
@@ -31,6 +37,12 @@ def callcc(proc: Callable) -> Any:
     ball = Continuation()
 
     def throw(retval: Any) -> None:
+        """
+        Throw the continuation.
+
+        Args:
+            retval (Any): The value to return to the continuation point.
+        """
         ball.retval = retval
         raise ball
     try:

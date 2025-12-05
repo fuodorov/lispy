@@ -1,3 +1,9 @@
+"""
+Type definitions for Lispy.
+
+This module defines the types used in the interpreter, such as `Symbol`, `Exp`,
+and `Atom`.
+"""
 from typing import Any, Dict, List, Union
 
 from .constants import QUASIQUOTE_CHAR, QUOTE_CHAR, UNQUOTE_CHAR, UNQUOTE_SPLICING_CHAR

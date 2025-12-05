@@ -1,3 +1,9 @@
+"""
+Macro expansion module.
+
+This module handles the expansion of macros and special forms before evaluation.
+It includes the `expand` function and handlers for various special forms.
+"""
 from .errors import SchemeSyntaxError
 from .evaluator import eval
 from .messages import (
@@ -33,6 +39,15 @@ from .types import (
 
 
 def is_pair(x: Exp) -> bool:
+    """
+    Check if x is a pair (non-empty list).
+
+    Args:
+        x (Exp): The expression to check.
+
+    Returns:
+        bool: True if x is a pair, False otherwise.
+    """
     return x != [] and isinstance(x, list)
 
 
@@ -53,11 +68,31 @@ def require(x: Exp, predicate: bool, msg: str = ERR_WRONG_LENGTH) -> None:
 
 
 def expand_quote(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a quote expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) == 2)
     return x
 
 
 def expand_if(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand an if expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     if len(x) == 3:
         x = x + [None]
     require(x, len(x) == 4)
@@ -65,6 +100,16 @@ def expand_if(x: Exp, toplevel: bool) -> Exp:
 
 
 def expand_set(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a set! expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) == 3)
     var = x[1]
     require(x, isinstance(var, Symbol), ERR_SET_SYMBOL)
@@ -72,6 +117,16 @@ def expand_set(x: Exp, toplevel: bool) -> Exp:
 
 
 def expand_define(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a define expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) >= 3)
     _def, v, body = x[0], x[1], x[2:]
     if isinstance(v, list) and v:
@@ -91,6 +146,16 @@ def expand_define(x: Exp, toplevel: bool) -> Exp:
 
 
 def expand_begin(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a begin expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     if len(x) == 1:
         return None
     else:
@@ -98,6 +163,16 @@ def expand_begin(x: Exp, toplevel: bool) -> Exp:
 
 
 def expand_lambda(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a lambda expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) >= 3)
     vars, body = x[1], x[2:]
     require(x, (isinstance(vars, list) and all(isinstance(v, Symbol) for v in vars))
@@ -107,16 +182,46 @@ def expand_lambda(x: Exp, toplevel: bool) -> Exp:
 
 
 def expand_quasiquote_macro(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a quasiquote expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) == 2)
     return expand_quasiquote(x[1])
 
 
 def expand_try(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a try expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) == 3)
     return [_try, expand(x[1], toplevel), expand(x[2], toplevel)]
 
 
 def expand_dynamic_let(x: Exp, toplevel: bool) -> Exp:
+    """
+    Expand a dynamic-let expression.
+
+    Args:
+        x (Exp): The expression.
+        toplevel (bool): Whether it's at the top level.
+
+    Returns:
+        Exp: The expanded expression.
+    """
     require(x, len(x) >= 3)
     bindings, body = x[1], x[2:]
     require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
