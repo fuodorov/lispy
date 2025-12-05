@@ -5,6 +5,15 @@ class LispyError(Exception):
     pass
 
 
+class Continuation(BaseException):
+    """
+    Used for call/cc control flow. Inherits from BaseException so it's not caught
+    by standard 'try' blocks which catch Exception.
+    """
+    def __init__(self, retval=None):
+        self.retval = retval
+
+
 class ParseError(LispyError):
     """
     Raised when the parser encounters an error (e.g. unexpected EOF, unexpected parenthesis).

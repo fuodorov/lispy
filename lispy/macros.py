@@ -212,7 +212,10 @@ def let(*args: Exp) -> Exp:
     bindings, body = args[0], args[1:]
     require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
                    for b in bindings), ERR_ILLEGAL_BINDING)
-    vars, vals = zip(*bindings)
+    if not bindings:
+        vars, vals = [], []
+    else:
+        vars, vals = zip(*bindings)
     return [[_lambda, list(vars)] + list(map(expand, body))] + list(map(expand, vals))
 
 

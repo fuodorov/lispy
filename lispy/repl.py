@@ -32,10 +32,12 @@ def load(filename: str) -> None:
     Args:
         filename (str): The path to the file to load.
     """
-    repl(None, InPort(open(filename)), None)
+    with open(filename) as f:
+        repl(None, InPort(f), None, stop_on_error=True)
 
 
-def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[TextIO] = sys.stdout) -> None:
+def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[TextIO] = sys.stdout,
+         stop_on_error: bool = False) -> None:
     """
     A prompt-read-eval-print loop.
 
@@ -43,10 +45,14 @@ def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[Te
         prompt (str, optional): The prompt string. Defaults to 'lispy> '.
         inport (Optional[InPort], optional): The input port. Defaults to None (stdin).
         out (Optional[TextIO], optional): The output stream. Defaults to sys.stdout.
+        stop_on_error (bool, optional): Whether to exit on error. Defaults to False.
     """
     if inport is None:
         inport = InPort(sys.stdin)
-    sys.stderr.write(WELCOME + '\n')
+
+    if prompt:
+        sys.stderr.write(WELCOME + '\n')
+
     while True:
         try:
             if prompt:
@@ -54,15 +60,24 @@ def repl(prompt: str = PROMPT, inport: Optional[InPort] = None, out: Optional[Te
                 sys.stderr.flush()
             x = parse(inport)
             if x is EOF_OBJECT:
-                sys.stderr.write(GOODBYE + '\n')
+                if prompt:
+                    sys.stderr.write(GOODBYE + '\n')
                 return
             val = eval(x)
             if val is not None and out:
                 print(to_string(val), file=out)
         except LispyError as e:
-            print('%s: %s' % (type(e).__name__, e))
+            print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
+            if stop_on_error:
+                sys.exit(1)
+        except KeyboardInterrupt:
+            print("\nKeyboardInterrupt", file=sys.stderr)
+            if not prompt:
+                return
         except Exception as e:
-            print('%s: %s' % (type(e).__name__, e))
+            print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
+            if stop_on_error:
+                sys.exit(1)
 
 
 if __name__ == '__main__':

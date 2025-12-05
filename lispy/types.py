@@ -2,9 +2,8 @@ from typing import Any, Dict, List, Union
 
 from .constants import QUASIQUOTE_CHAR, QUOTE_CHAR, UNQUOTE_CHAR, UNQUOTE_SPLICING_CHAR
 
-Symbol = str
 Number = Union[int, float]
-Atom = Union[Symbol, Number]
+Atom = Union[str, Number]
 ListType = List[Any]
 Exp = Union[Atom, ListType]
 EnvType = Dict[str, Any]
@@ -20,14 +19,17 @@ class Symbol(str):
     pass
 
 
-def get_symbol(s: str, symbol_table: Dict[str, Symbol] = {}) -> Symbol:
+_symbol_table: Dict[str, Symbol] = {}
+
+
+def get_symbol(s: str, symbol_table: Dict[str, Symbol] = _symbol_table) -> Symbol:
     """
     Find or create a unique Symbol entry for the string `s` in the symbol table.
 
     Args:
         s (str): The string representation of the symbol.
         symbol_table (Dict[str, Symbol], optional): The symbol table to use.
-            Defaults to a persistent mutable dictionary.
+            Defaults to the module-level symbol table.
 
     Returns:
         Symbol: The unique Symbol instance corresponding to `s`.

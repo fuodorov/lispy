@@ -7,6 +7,7 @@ from typing import Any, Callable
 
 from .constants import FILE_WRITE_MODE
 from .env import Env
+from .errors import Continuation
 from .evaluator import eval
 from .macros import expand
 from .parser import read, readchar, to_string
@@ -25,16 +26,16 @@ def callcc(proc: Callable) -> Any:
         Any: The result of the procedure or the continuation value.
 
     Raises:
-        RuntimeWarning: Used to implement the continuation jump.
+        Continuation: Used to implement the continuation jump.
     """
-    ball = RuntimeWarning("Sorry, can't continue this continuation any longer.")
+    ball = Continuation()
 
     def throw(retval: Any) -> None:
         ball.retval = retval
         raise ball
     try:
         return proc(throw)
-    except RuntimeWarning as w:
+    except Continuation as w:
         if w is ball:
             return ball.retval
         else:
