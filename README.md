@@ -6,7 +6,7 @@
 
 ## Демонстрация
 
-[![asciicast](https://asciinema.org/a/3aktezFCZWg9h0ajPeRi0nTp8.svg)](https://asciinema.org/a/3aktezFCZWg9h0ajPeRi0nTp8)
+[![asciicast](https://asciinema.org/a/JCR1NMofRBxXKAHcitO0oaaWr.svg)](https://asciinema.org/a/JCR1NMofRBxXKAHcitO0oaaWr)
 
 ## Возможности
 
