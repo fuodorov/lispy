@@ -19,7 +19,7 @@ from .evaluator import eval
 from .macros import expand
 from .parser import read, readchar, to_string
 from .repl import load
-from .types import EOF_OBJECT, Exp, ListType, Symbol
+from .types import EOF_OBJECT, Exp, ListType, Promise, Symbol
 
 
 def callcc(proc: Callable) -> Any:
@@ -53,6 +53,37 @@ def callcc(proc: Callable) -> Any:
             return ball.retval
         else:
             raise w
+
+
+def make_promise(proc: Callable) -> Promise:
+    """
+    Create a new Promise.
+
+    Args:
+        proc (Callable): The thunk (procedure with no arguments) to delay.
+
+    Returns:
+        Promise: The created promise.
+    """
+    return Promise(proc)
+
+
+def force(obj: Any) -> Any:
+    """
+    Force the evaluation of a promise.
+
+    Args:
+        obj (Any): The object to force.
+
+    Returns:
+        Any: The result of the promise evaluation, or the object itself if not a promise.
+    """
+    if isinstance(obj, Promise):
+        if not obj.computed:
+            obj.memo = obj.proc()
+            obj.computed = True
+        return obj.memo
+    return obj
 
 
 def is_pair(x: Exp) -> bool:
@@ -126,6 +157,7 @@ def add_globals(env: Env) -> Env:
         'boolean?': lambda x: isinstance(x, bool), 'pair?': is_pair,
         'port?': lambda x: isinstance(x, io.IOBase), 'apply': lambda proc, lst: proc(*lst),
         'eval': lambda x: eval(expand(x)), 'load': lambda fn: load(fn), 'call/cc': callcc,
+        'force': force, 'make-promise': make_promise,
         'open-input-file': open, 'close-input-port': lambda p: p.file.close(),
         'open-output-file': lambda f: open(f, FILE_WRITE_MODE), 'close-output-port': lambda p: p.close(),
         'eof-object?': lambda x: x is EOF_OBJECT, 'read-char': readchar,

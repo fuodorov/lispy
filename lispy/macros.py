@@ -25,10 +25,12 @@ from .types import (
     _cons,
     _define,
     _definemacro,
+    _delay,
     _dynamic_let,
     _if,
     _lambda,
     _let,
+    _make_promise,
     _quasiquote,
     _quote,
     _set,
@@ -324,4 +326,19 @@ def let(*args: Exp) -> Exp:
     return [[_lambda, list(vars)] + list(map(expand, body))] + list(map(expand, vals))
 
 
-macro_table = {_let: let}
+def delay(exp: Exp) -> Exp:
+    """
+    Expand a delay expression.
+
+    (delay exp) -> (make-promise (lambda () exp))
+
+    Args:
+        exp (Exp): The expression to delay.
+
+    Returns:
+        Exp: The expanded expression.
+    """
+    return [_make_promise, [_lambda, [], exp]]
+
+
+macro_table = {_let: let, _delay: delay}

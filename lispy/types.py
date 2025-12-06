@@ -15,6 +15,16 @@ Exp = Union[Atom, ListType]
 EnvType = Dict[str, Any]
 
 
+class Promise:
+    """
+    A Scheme Promise (delayed evaluation).
+    """
+    def __init__(self, proc: Any) -> None:
+        self.proc = proc
+        self.memo = None
+        self.computed = False
+
+
 class Symbol(str):
     """
     A Scheme Symbol.
@@ -61,6 +71,8 @@ _cons = get_symbol('cons')
 _let = get_symbol('let')
 _try = get_symbol('try')
 _dynamic_let = get_symbol('dynamic-let')
+_delay = get_symbol('delay')
+_make_promise = get_symbol('make-promise')
 
 EOF_OBJECT = get_symbol('#<eof-object>')
 
