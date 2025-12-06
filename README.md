@@ -186,6 +186,8 @@ sphinx-build -b html docs docs/_build/html
 - [x] Динамическое связывание (`dynamic-let`)
 - [x] Модульная архитектура
 - [x] Покрытие тестами
+- [x] CI/CD (GitHub Actions)
+- [x] Документация (Sphinx)
 
 
 ## Ссылки
