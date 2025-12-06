@@ -29,7 +29,7 @@ lispy/
     __init__.py    # Инициализация пакета, определение встроенных макросов
     __main__.py    # Точка входа (python -m lispy)
     types.py       # Типы данных (Symbol, Exp, Atom)
-    constants.py   # Константы и настройки
+    constants.py   # Константы и настрцойки
     errors.py      # Классы исключений
     messages.py    # Тексты сообщений об ошибках
     parser.py      # Токенизатор и парсер (read)
@@ -39,7 +39,11 @@ lispy/
     primitives.py  # Стандартная библиотека функций
     repl.py        # Read-Eval-Print Loop
 tests/
-    test_integration.py    # Интеграционные тесты
+    test_math.py           # Тесты математических функций
+    test_lists.py          # Тесты работы со списками
+    test_control_flow.py   # Тесты управляющих конструкций
+    test_definitions.py    # Тесты определений и функций
+    test_syntax.py         # Тесты синтаксиса
     test_parser.py         # Юнит-тесты парсера
     test_env.py            # Юнит-тесты окружения
     test_try_catch.py      # Тесты обработки исключений

@@ -1,4 +1,4 @@
-import lispy
+from tests.utils import run
 
 
 def test_curry_simple():
@@ -10,7 +10,7 @@ def test_curry_simple():
         (add-5 10)
     )
     """
-    assert lispy.eval(lispy.parse(code)) == 15
+    assert run(code) == 15
 
 
 def test_curry_immediate():
@@ -21,7 +21,7 @@ def test_curry_immediate():
         (((add-c 1) 2) 3)
     )
     """
-    assert lispy.eval(lispy.parse(code)) == 6
+    assert run(code) == 6
 
 
 def test_curry_mixed():
@@ -32,7 +32,7 @@ def test_curry_mixed():
         ((add-c 1 2) 3)
     )
     """
-    assert lispy.eval(lispy.parse(code)) == 6
+    assert run(code) == 6
 
 
 def test_curry_full():
@@ -43,4 +43,4 @@ def test_curry_full():
         (add-c 1 2)
     )
     """
-    assert lispy.eval(lispy.parse(code)) == 3
+    assert run(code) == 3

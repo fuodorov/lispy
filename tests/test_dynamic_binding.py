@@ -1,27 +1,27 @@
-import lispy
+from tests.utils import run
 
 
 def test_dynamic_let_global():
     # Define a global variable
-    lispy.eval(lispy.parse("(define *x* 10)"))
+    run("(define *x* 10)")
 
     # Define a function that uses it
-    lispy.eval(lispy.parse("(define (read-x) *x*)"))
+    run("(define (read-x) *x*)")
 
     # Check initial value
-    assert lispy.eval(lispy.parse("(read-x)")) == 10
+    assert run("(read-x)") == 10
 
     # Use dynamic-let to change it temporarily
-    res = lispy.eval(lispy.parse("(dynamic-let ((*x* 20)) (read-x))"))
+    res = run("(dynamic-let ((*x* 20)) (read-x))")
     assert res == 20
 
     # Check it is restored
-    assert lispy.eval(lispy.parse("(read-x)")) == 10
+    assert run("(read-x)") == 10
 
 
 def test_dynamic_let_nested():
-    lispy.eval(lispy.parse("(define *y* 1)"))
-    lispy.eval(lispy.parse("(define (read-y) *y*)"))
+    run("(define *y* 1)")
+    run("(define (read-y) *y*)")
 
     code = """
     (dynamic-let ((*y* 2))
@@ -30,7 +30,7 @@ def test_dynamic_let_nested():
                   (read-y))
               (read-y)))
     """
-    res = lispy.eval(lispy.parse(code))
+    res = run(code)
     # Should be (2 3 2)
     # (read-y) -> 2
     # inner (read-y) -> 3
@@ -40,11 +40,11 @@ def test_dynamic_let_nested():
     assert res == [2, 3, 2]
 
     # Check restored
-    assert lispy.eval(lispy.parse("(read-y)")) == 1
+    assert run("(read-y)") == 1
 
 
 def test_dynamic_let_exception():
-    lispy.eval(lispy.parse("(define *z* 100)"))
+    run("(define *z* 100)")
 
     code = """
     (try
@@ -59,5 +59,5 @@ def test_dynamic_let_exception():
     # The try is outside dynamic-let.
     # So dynamic-let should have finished (abruptly) and restored *z*.
 
-    res = lispy.eval(lispy.parse(code))
+    res = run(code)
     assert res == 100

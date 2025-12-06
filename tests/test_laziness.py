@@ -1,4 +1,4 @@
-import lispy
+from tests.utils import run
 
 
 def test_delay_force():
@@ -9,7 +9,7 @@ def test_delay_force():
         (force p)
     )
     """
-    assert lispy.eval(lispy.parse(code)) == 3
+    assert run(code) == 3
 
 
 def test_memoization():
@@ -24,7 +24,7 @@ def test_memoization():
     )
     """
     # v1 should be 1, v2 should be 1, count should be 1
-    assert lispy.eval(lispy.parse(code)) == [1, 1, 1]
+    assert run(code) == [1, 1, 1]
 
 
 def test_infinite_stream():
@@ -40,7 +40,7 @@ def test_infinite_stream():
               (head (tail (tail ones))))
     )
     """
-    assert lispy.eval(lispy.parse(code)) == [1, 1, 1]
+    assert run(code) == [1, 1, 1]
 
 
 def test_integers_stream():
@@ -58,4 +58,4 @@ def test_integers_stream():
               (head (tail (tail ints))))
     )
     """
-    assert lispy.eval(lispy.parse(code)) == [1, 2, 3]
+    assert run(code) == [1, 2, 3]
