@@ -51,3 +51,10 @@ class ArgumentError(LispyError, TypeError):
     Raised when function arguments don't match parameters.
     """
     pass
+
+
+class UserError(LispyError):
+    """
+    Raised by the user via the 'raise' primitive.
+    """
+    pass

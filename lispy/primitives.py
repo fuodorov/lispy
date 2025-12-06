@@ -14,9 +14,10 @@ from typing import Any, Callable
 
 from .constants import FILE_WRITE_MODE
 from .env import Env
-from .errors import Continuation
-from .evaluator import eval
+from .errors import ArgumentError, Continuation, UserError
+from .evaluator import Procedure, eval
 from .macros import expand
+from .messages import ERR_CURRY_USER_PROC, ERR_CURRY_VARIADIC
 from .parser import read, readchar, to_string
 from .repl import load
 from .types import EOF_OBJECT, Exp, ListType, Promise, Symbol
@@ -86,6 +87,32 @@ def force(obj: Any) -> Any:
     return obj
 
 
+def curry(proc: Any) -> Any:
+    """
+    Return a curried version of the procedure.
+
+    Args:
+        proc (Any): The procedure to curry.
+
+    Returns:
+        Any: A new procedure that accepts arguments incrementally.
+    """
+    if not isinstance(proc, Procedure):
+        raise ArgumentError(ERR_CURRY_USER_PROC)
+
+    if not isinstance(proc.parms, list):
+        raise ArgumentError(ERR_CURRY_VARIADIC)
+
+    arity = len(proc.parms)
+
+    def curried(*args):
+        if len(args) >= arity:
+            return proc(*args)
+        return lambda *more: curried(*(args + more))
+
+    return curried
+
+
 def is_pair(x: Exp) -> bool:
     """
     Check if x is a pair (non-empty list).
@@ -126,7 +153,7 @@ def raise_error(x: Any) -> None:
     if isinstance(x, Exception):
         raise x
     else:
-        raise Exception(to_string(x))
+        raise UserError(to_string(x))
 
 
 def add_globals(env: Env) -> Env:
@@ -157,7 +184,7 @@ def add_globals(env: Env) -> Env:
         'boolean?': lambda x: isinstance(x, bool), 'pair?': is_pair,
         'port?': lambda x: isinstance(x, io.IOBase), 'apply': lambda proc, lst: proc(*lst),
         'eval': lambda x: eval(expand(x)), 'load': lambda fn: load(fn), 'call/cc': callcc,
-        'force': force, 'make-promise': make_promise,
+        'force': force, 'make-promise': make_promise, 'curry': curry,
         'open-input-file': open, 'close-input-port': lambda p: p.file.close(),
         'open-output-file': lambda f: open(f, FILE_WRITE_MODE), 'close-output-port': lambda p: p.close(),
         'eof-object?': lambda x: x is EOF_OBJECT, 'read-char': readchar,
