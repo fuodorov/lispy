@@ -5,7 +5,8 @@ This module handles the tokenization and parsing of Scheme source code into
 Abstract Syntax Trees (ASTs).
 """
 import re
-from typing import Optional, TextIO
+from functools import singledispatch
+from typing import Any, Optional, TextIO
 
 from .constants import (
     COMMENT_CHAR,
@@ -137,41 +138,52 @@ def atom(token: str) -> Atom:
         return True
     elif token == FALSE_LITERAL:
         return False
-    elif token[0] == STRING_QUOTE:
+    elif token.startswith(STRING_QUOTE):
         return token[1:-1].encode('utf-8').decode('unicode_escape')
-    try:
-        return int(token)
-    except ValueError:
+
+    for converter in [int, float, lambda t: complex(t.replace(COMPLEX_IMAG_CHAR_SCHEME, COMPLEX_IMAG_CHAR_PYTHON, 1))]:
         try:
-            return float(token)
+            return converter(token)
         except ValueError:
-            try:
-                return complex(token.replace(COMPLEX_IMAG_CHAR_SCHEME, COMPLEX_IMAG_CHAR_PYTHON, 1))
-            except ValueError:
-                return get_symbol(token)
+            continue
+
+    return get_symbol(token)
 
 
-def to_string(x: Exp) -> str:
+@singledispatch
+def to_string(x: Any) -> str:
     """
     Convert a Python object back into a Lisp-readable string.
 
     Args:
-        x (Exp): The expression to convert.
+        x (Any): The expression to convert.
 
     Returns:
         str: The string representation of the expression.
     """
-    if x is True:
-        return TRUE_LITERAL
-    elif x is False:
-        return FALSE_LITERAL
-    elif isinstance(x, Symbol):
-        return x
-    elif isinstance(x, str):
-        return '"%s"' % x.encode('unicode_escape').decode('utf-8').replace('"', r'\"')
-    elif isinstance(x, list):
-        return LPAREN + ' '.join(map(to_string, x)) + RPAREN
-    elif isinstance(x, complex):
-        return str(x).replace(COMPLEX_IMAG_CHAR_PYTHON, COMPLEX_IMAG_CHAR_SCHEME)
-    else:
-        return str(x)
+    return str(x)
+
+
+@to_string.register
+def _(x: bool) -> str:
+    return TRUE_LITERAL if x else FALSE_LITERAL
+
+
+@to_string.register
+def _(x: Symbol) -> str:
+    return x
+
+
+@to_string.register
+def _(x: str) -> str:
+    return '"%s"' % x.encode('unicode_escape').decode('utf-8').replace('"', r'\"')
+
+
+@to_string.register
+def _(x: list) -> str:
+    return LPAREN + ' '.join(map(to_string, x)) + RPAREN
+
+
+@to_string.register
+def _(x: complex) -> str:
+    return str(x).replace(COMPLEX_IMAG_CHAR_PYTHON, COMPLEX_IMAG_CHAR_SCHEME)
