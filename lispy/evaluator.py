@@ -9,8 +9,9 @@ from typing import Any, List, Optional
 
 from .constants import TYPE_ANNOTATION_CHAR
 from .env import Env, global_env
-from .errors import TypeMismatchError, UserError
-from .messages import ERR_TYPE_MISMATCH, ERR_UNKNOWN_TYPE
+from .errors import TypeMismatchError
+from .messages import ERR_TYPE_MISMATCH
+from .type_checker import check_type
 from .types import (
     Exp,
     Symbol,
@@ -23,39 +24,6 @@ from .types import (
     _set,
     _try,
 )
-
-
-TYPE_MAPPING = {
-    'int': int,
-    'float': float,
-    'str': str,
-    'bool': bool,
-    'list': list,
-}
-
-
-def check_type(val: Any, type_sym: str) -> bool:
-    """
-    Check if value matches the Scheme type symbol.
-
-    Args:
-        val (Any): The value to check.
-        type_sym (str): The type symbol (e.g. 'int').
-
-    Returns:
-        bool: True if the value matches the type, False otherwise.
-
-    Raises:
-        UserError: If the type symbol is unknown.
-    """
-    if type_sym not in TYPE_MAPPING:
-        raise UserError(ERR_UNKNOWN_TYPE)
-
-    expected_type = TYPE_MAPPING[type_sym]
-    # Special case for numbers? In Python bool is int.
-    if expected_type is int and isinstance(val, bool):
-        return False
-    return isinstance(val, expected_type)
 
 
 class Procedure:
