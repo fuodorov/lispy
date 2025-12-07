@@ -214,6 +214,9 @@ sphinx-build -b html docs docs/_build/html
 - [x] `call/cc`
 - [x] Обработка ошибок (Custom Exceptions, `try`, `raise`)
 - [x] Динамическое связывание (`dynamic-let`)
+- [x] Ленивые вычисления (`delay`, `force`)
+- [x] Каррирование (`curry`)
+- [x] Система типов (аннотации типов, проверка во время выполнения)
 - [x] Модульная архитектура
 - [x] Покрытие тестами
 - [x] CI/CD (GitHub Actions)
