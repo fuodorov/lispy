@@ -11,6 +11,8 @@ ERR_SET_SYMBOL = "can set! only a symbol"
 ERR_ILLEGAL_LAMBDA = "illegal lambda argument list"
 ERR_CURRY_USER_PROC = "Only user-defined procedures can be curried"
 ERR_CURRY_VARIADIC = "Cannot curry variadic procedures"
+ERR_TYPE_MISMATCH = "Type mismatch"
+ERR_UNKNOWN_TYPE = "Unknown type"
 
 PROMPT = "lispy> "
 WELCOME = "Welcome to Lispy!"

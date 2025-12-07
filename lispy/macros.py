@@ -4,6 +4,7 @@ Macro expansion module.
 This module handles the expansion of macros and special forms before evaluation.
 It includes the `expand` function and handlers for various special forms.
 """
+from .constants import TYPE_ANNOTATION_CHAR
 from .errors import SchemeSyntaxError
 from .evaluator import eval
 from .messages import (
@@ -135,6 +136,12 @@ def expand_define(x: Exp, toplevel: bool) -> Exp:
         f, args = v[0], v[1:]
         return expand([_def, f, [_lambda, args] + body], toplevel)
     else:
+        if len(x) == 5 and x[2] == TYPE_ANNOTATION_CHAR:
+            # Typed definition: (define var :: type exp)
+            require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
+            exp = expand(x[4])
+            return [_define, v, TYPE_ANNOTATION_CHAR, x[3], exp]
+
         require(x, len(x) == 3)
         require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
         exp = expand(x[2])

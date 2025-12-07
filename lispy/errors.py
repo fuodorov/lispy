@@ -58,3 +58,10 @@ class UserError(LispyError):
     Raised by the user via the 'raise' primitive.
     """
     pass
+
+
+class TypeMismatchError(LispyError, TypeError):
+    """
+    Raised when a type check fails.
+    """
+    pass

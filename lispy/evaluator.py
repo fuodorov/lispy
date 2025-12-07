@@ -7,8 +7,55 @@ using the `TailCall` class.
 """
 from typing import Any, List, Optional
 
+from .constants import TYPE_ANNOTATION_CHAR
 from .env import Env, global_env
-from .types import Exp, Symbol, _begin, _define, _dynamic_let, _if, _lambda, _quote, _set, _try
+from .errors import TypeMismatchError, UserError
+from .messages import ERR_TYPE_MISMATCH, ERR_UNKNOWN_TYPE
+from .types import (
+    Exp,
+    Symbol,
+    _begin,
+    _define,
+    _dynamic_let,
+    _if,
+    _lambda,
+    _quote,
+    _set,
+    _try,
+)
+
+
+TYPE_MAPPING = {
+    'int': int,
+    'float': float,
+    'str': str,
+    'bool': bool,
+    'list': list,
+}
+
+
+def check_type(val: Any, type_sym: str) -> bool:
+    """
+    Check if value matches the Scheme type symbol.
+
+    Args:
+        val (Any): The value to check.
+        type_sym (str): The type symbol (e.g. 'int').
+
+    Returns:
+        bool: True if the value matches the type, False otherwise.
+
+    Raises:
+        UserError: If the type symbol is unknown.
+    """
+    if type_sym not in TYPE_MAPPING:
+        raise UserError(ERR_UNKNOWN_TYPE)
+
+    expected_type = TYPE_MAPPING[type_sym]
+    # Special case for numbers? In Python bool is int.
+    if expected_type is int and isinstance(val, bool):
+        return False
+    return isinstance(val, expected_type)
 
 
 class Procedure:
@@ -29,7 +76,35 @@ class Procedure:
             exp (Exp): Procedure body expression.
             env (Env): Definition environment.
         """
-        self.parms, self.exp, self.env = parms, exp, env
+        self.types = {}
+        self.parms = []
+
+        if isinstance(parms, list):
+            i = 0
+            while i < len(parms):
+                p = parms[i]
+                self.parms.append(p)
+                if i + 2 < len(parms) and parms[i + 1] == TYPE_ANNOTATION_CHAR:
+                    self.types[p] = parms[i + 2]
+                    i += 3
+                else:
+                    i += 1
+        else:
+            self.parms = parms
+
+        self.exp, self.env = exp, env
+
+    def check_types(self, args: List[Any]) -> None:
+        """
+        Check argument types against annotations.
+        """
+        if isinstance(self.parms, list):
+            for i, p in enumerate(self.parms):
+                if p in self.types and i < len(args):
+                    val = args[i]
+                    type_sym = self.types[p]
+                    if not check_type(val, type_sym):
+                        raise TypeMismatchError(ERR_TYPE_MISMATCH)
 
     def __call__(self, *args: Exp) -> Any:
         """
@@ -119,8 +194,15 @@ def eval_define(x: Exp, env: Env) -> Any:
     Returns:
         Any: None.
     """
-    (_, var, exp) = x
-    env[var] = eval(exp, env)
+    if len(x) == 5 and x[2] == TYPE_ANNOTATION_CHAR:
+        (_, var, _, type_sym, exp) = x
+        val = eval(exp, env)
+        if not check_type(val, type_sym):
+            raise TypeMismatchError(ERR_TYPE_MISMATCH)
+        env[var] = val
+    else:
+        (_, var, exp) = x
+        env[var] = eval(exp, env)
     return None
 
 
@@ -262,6 +344,7 @@ def eval(x: Exp, env: Optional[Env] = None) -> Any:
             exps = [eval(exp, env) for exp in x]
             proc = exps.pop(0)
             if isinstance(proc, Procedure):
+                proc.check_types(exps)
                 x = proc.exp
                 env = Env(proc.parms, exps, proc.env)
             else:
