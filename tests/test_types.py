@@ -75,7 +75,7 @@ def test_type_mismatches_other_types():
 
 
 def test_unknown_type():
-    with pytest.raises(UserError, match="Unknown type"):
+    with pytest.raises(UserError, match="unknown type"):
         run("(define x :: unknown 10)")
 
 

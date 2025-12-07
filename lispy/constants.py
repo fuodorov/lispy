@@ -20,12 +20,6 @@ FILE_WRITE_MODE = 'w'
 
 TYPE_ANNOTATION_CHAR = '::'
 
-TYPE_INT = 'int'
-TYPE_FLOAT = 'float'
-TYPE_STR = 'str'
-TYPE_BOOL = 'bool'
-TYPE_LIST = 'list'
-
 # Special characters that delimit atoms
 _SPECIAL_CHARS = "".join([
     LPAREN, RPAREN, QUOTE_CHAR, QUASIQUOTE_CHAR, UNQUOTE_CHAR, STRING_QUOTE, COMMENT_CHAR

@@ -3,16 +3,15 @@ Type checking functionality.
 """
 from typing import Any
 
-from .constants import TYPE_BOOL, TYPE_FLOAT, TYPE_INT, TYPE_LIST, TYPE_STR
 from .errors import UserError
 from .messages import ERR_UNKNOWN_TYPE
 
 TYPE_MAPPING = {
-    TYPE_INT: int,
-    TYPE_FLOAT: float,
-    TYPE_STR: str,
-    TYPE_BOOL: bool,
-    TYPE_LIST: list,
+    'int': int,
+    'float': float,
+    'str': str,
+    'bool': bool,
+    'list': list,
 }
 
 
