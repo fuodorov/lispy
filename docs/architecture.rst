@@ -51,3 +51,37 @@ An exception system similar to Python's is implemented, but inside Lisp.
 In addition to lexical (static) binding, dynamic binding is implemented via ``dynamic-let``.
 
 *   This allows temporarily overriding the value of a global variable only for the duration of a specific code block. After exiting the block, the old value is restored. This is useful for configurations and context variables.
+
+8. Lazy Evaluation
+------------------
+Primitives for delayed evaluation are implemented.
+
+*   **Promise**: A special data type storing an unevaluated expression and (after the first evaluation) its result.
+*   **Delay**: The ``(delay exp)`` macro wraps an expression into a ``Promise``.
+*   **Force**: The ``(force promise)`` function evaluates the ``Promise`` value on the first access and returns the cached result on subsequent ones (memoization).
+
+9. Currying
+-----------
+The ``curry`` function allows transforming a function of N arguments into a chain of N functions of one argument.
+
+*   This is useful for partial application of functions and creating new functions based on existing ones.
+*   Supported only for user-defined procedures (not for built-in primitives with variable number of arguments).
+
+10. Type System
+---------------
+A basic runtime type checking system is implemented.
+
+*   **Syntax**: Types are specified via ``::``.
+    *   Definitions: ``(define x :: int 10)``
+    *   Arguments: ``(lambda (x :: int) ...)``
+*   **Supported Types**: ``int``, ``float``, ``str``, ``bool``, ``list``.
+*   **Check**: If the passed value does not match the specified type, a ``TypeMismatchError`` exception is thrown.
+
+11. Python Interoperability
+---------------------------
+Lispy allows using the power of the Python ecosystem directly.
+
+*   **py-import**: Imports a Python module.
+*   **py-getattr**: Gets an attribute of an object (function, variable, class).
+*   **py-eval**: Evaluates a Python code string and returns the result.
+*   **py-exec**: Executes a Python code string (for side effects).
