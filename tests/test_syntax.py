@@ -1,6 +1,15 @@
 import pytest
+import re
 
 from lispy.errors import SchemeSyntaxError
+from lispy.messages import (
+    ERR_CANT_SPLICE,
+    ERR_DEFINE_MACRO_TOPLEVEL,
+    ERR_DEFINE_SYMBOL,
+    ERR_ILLEGAL_BINDING,
+    ERR_ILLEGAL_LAMBDA,
+    ERR_WRONG_LENGTH,
+)
 from tests.utils import run
 
 
@@ -24,24 +33,24 @@ def test_comments():
 
 
 def test_syntax_errors():
-    with pytest.raises(SchemeSyntaxError, match="wrong length"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_WRONG_LENGTH):
         run("()")
-    with pytest.raises(SchemeSyntaxError, match="wrong length"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_WRONG_LENGTH):
         run("(set! x)")
-    with pytest.raises(SchemeSyntaxError, match="can define only a symbol"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_DEFINE_SYMBOL.format("3")):
         run("(define 3 4)")
-    with pytest.raises(SchemeSyntaxError, match="wrong length"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_WRONG_LENGTH):
         run("(quote 1 2)")
-    with pytest.raises(SchemeSyntaxError, match="wrong length"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_WRONG_LENGTH):
         run("(if 1 2 3 4)")
-    with pytest.raises(SchemeSyntaxError, match="illegal lambda argument list"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_ILLEGAL_LAMBDA.format("3")):
         run("(lambda 3 3)")
-    with pytest.raises(SchemeSyntaxError, match="wrong length"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_WRONG_LENGTH):
         run("(lambda (x))")
-    with pytest.raises(SchemeSyntaxError, match="define-macro only allowed at top level"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_DEFINE_MACRO_TOPLEVEL):
         run("""(if (= 1 2) (define-macro a 'a)
     (define-macro a 'b))""")
-    with pytest.raises(SchemeSyntaxError, match="illegal binding list"):
+    with pytest.raises(SchemeSyntaxError, match=re.escape(ERR_ILLEGAL_BINDING.format("(b 2 3)"))):
         run("(let ((a 1) (b 2 3)) (+ a b))")
-    with pytest.raises(SchemeSyntaxError, match="can't splice here"):
+    with pytest.raises(SchemeSyntaxError, match=ERR_CANT_SPLICE):
         run("`,@L")

@@ -115,7 +115,7 @@ def expand_set(x: Exp, toplevel: bool) -> Exp:
     """
     require(x, len(x) == 3)
     var = x[1]
-    require(x, isinstance(var, Symbol), ERR_SET_SYMBOL)
+    require(x, isinstance(var, Symbol), ERR_SET_SYMBOL.format(to_string(var)))
     return [_set, var, expand(x[2])]
 
 
@@ -138,17 +138,17 @@ def expand_define(x: Exp, toplevel: bool) -> Exp:
     else:
         if len(x) == 5 and x[2] == TYPE_ANNOTATION_CHAR:
             # Typed definition: (define var :: type exp)
-            require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
+            require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL.format(to_string(v)))
             exp = expand(x[4])
             return [_define, v, TYPE_ANNOTATION_CHAR, x[3], exp]
 
         require(x, len(x) == 3)
-        require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL)
+        require(x, isinstance(v, Symbol), ERR_DEFINE_SYMBOL.format(to_string(v)))
         exp = expand(x[2])
         if _def is _definemacro:
             require(x, toplevel, ERR_DEFINE_MACRO_TOPLEVEL)
             proc = eval(exp)
-            require(x, callable(proc), ERR_MACRO_PROCEDURE)
+            require(x, callable(proc), ERR_MACRO_PROCEDURE.format(to_string(proc)))
             macro_table[v] = proc
             return None
         return [_define, v, exp]
@@ -185,7 +185,7 @@ def expand_lambda(x: Exp, toplevel: bool) -> Exp:
     require(x, len(x) >= 3)
     vars, body = x[1], x[2:]
     require(x, (isinstance(vars, list) and all(isinstance(v, Symbol) for v in vars))
-            or isinstance(vars, Symbol), ERR_ILLEGAL_LAMBDA)
+            or isinstance(vars, Symbol), ERR_ILLEGAL_LAMBDA.format(to_string(vars)))
     exp = body[0] if len(body) == 1 else [_begin] + body
     return [_lambda, vars, expand(exp)]
 
@@ -233,8 +233,9 @@ def expand_dynamic_let(x: Exp, toplevel: bool) -> Exp:
     """
     require(x, len(x) >= 3)
     bindings, body = x[1], x[2:]
-    require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
-                   for b in bindings), ERR_ILLEGAL_BINDING)
+    require(x, isinstance(bindings, list), ERR_ILLEGAL_BINDING.format(to_string(bindings)))
+    for b in bindings:
+        require(x, isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol), ERR_ILLEGAL_BINDING.format(to_string(b)))
     expanded_bindings = [[b[0], expand(b[1], toplevel)] for b in bindings]
     expanded_body = [expand(e, toplevel) for e in body]
     return [_dynamic_let, expanded_bindings] + expanded_body
@@ -324,8 +325,9 @@ def let(*args: Exp) -> Exp:
     x = [_let] + args
     require(x, len(args) > 1)
     bindings, body = args[0], args[1:]
-    require(x, all(isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol)
-                   for b in bindings), ERR_ILLEGAL_BINDING)
+    require(x, isinstance(bindings, list), ERR_ILLEGAL_BINDING.format(to_string(bindings)))
+    for b in bindings:
+        require(x, isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol), ERR_ILLEGAL_BINDING.format(to_string(b)))
     if not bindings:
         vars, vals = [], []
     else:

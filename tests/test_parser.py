@@ -3,6 +3,7 @@ import io
 import pytest
 
 from lispy import errors, parser, types
+from lispy.constants import FALSE_LITERAL, LPAREN, QUOTE_CHAR, RPAREN, TRUE_LITERAL
 
 
 def test_atom_numbers():
@@ -13,8 +14,8 @@ def test_atom_numbers():
 
 
 def test_atom_booleans():
-    assert parser.atom("#t") is True
-    assert parser.atom("#f") is False
+    assert parser.atom(TRUE_LITERAL) is True
+    assert parser.atom(FALSE_LITERAL) is False
 
 
 def test_atom_strings():
@@ -38,7 +39,7 @@ def test_tokenizer_simple():
         if token is types.EOF_OBJECT:
             break
         tokens.append(token)
-    assert tokens == ['(', '+', '1', '2', ')']
+    assert tokens == [LPAREN, '+', '1', '2', RPAREN]
 
 
 def test_tokenizer_quotes():
@@ -49,7 +50,7 @@ def test_tokenizer_quotes():
         if token is types.EOF_OBJECT:
             break
         tokens.append(token)
-    assert tokens == ["'", '(', '1', '2', ')']
+    assert tokens == [QUOTE_CHAR, LPAREN, '1', '2', RPAREN]
 
 
 def test_read_simple_list():
@@ -72,8 +73,8 @@ def test_read_quotes():
 
 def test_to_string():
     assert parser.to_string(1) == "1"
-    assert parser.to_string(True) == "#t"
-    assert parser.to_string(False) == "#f"
+    assert parser.to_string(True) == TRUE_LITERAL
+    assert parser.to_string(False) == FALSE_LITERAL
     assert parser.to_string("hello") == '"hello"'
     assert parser.to_string(types.get_symbol("x")) == "x"
     assert parser.to_string([types.get_symbol("+"), 1, 2]) == "(+ 1 2)"

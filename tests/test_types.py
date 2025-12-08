@@ -1,6 +1,7 @@
 import pytest
 
 from lispy.errors import TypeMismatchError, UserError
+from lispy.messages import ERR_UNKNOWN_TYPE
 from tests.utils import run
 
 
@@ -75,7 +76,7 @@ def test_type_mismatches_other_types():
 
 
 def test_unknown_type():
-    with pytest.raises(UserError, match="unknown type"):
+    with pytest.raises(UserError, match=ERR_UNKNOWN_TYPE.format("unknown")):
         run("(define x :: unknown 10)")
 
 

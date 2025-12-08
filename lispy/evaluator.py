@@ -9,8 +9,12 @@ from typing import Any, List, Optional
 
 from .constants import TYPE_ANNOTATION_CHAR
 from .env import Env, global_env
-from .errors import TypeMismatchError
-from .messages import ERR_TYPE_MISMATCH
+from .errors import SchemeSyntaxError, TypeMismatchError
+from .messages import (
+    ERR_MISSING_TYPE_ANNOTATION,
+    ERR_TYPE_MISMATCH,
+    ERR_UNEXPECTED_TYPE_ANNOTATION,
+)
 from .type_checker import check_type
 from .types import (
     Exp,
@@ -51,8 +55,13 @@ class Procedure:
             i = 0
             while i < len(parms):
                 p = parms[i]
+                if p == TYPE_ANNOTATION_CHAR:
+                    raise SchemeSyntaxError(ERR_UNEXPECTED_TYPE_ANNOTATION.format(TYPE_ANNOTATION_CHAR))
+
                 self.parms.append(p)
-                if i + 2 < len(parms) and parms[i + 1] == TYPE_ANNOTATION_CHAR:
+                if i + 1 < len(parms) and parms[i + 1] == TYPE_ANNOTATION_CHAR:
+                    if i + 2 >= len(parms):
+                        raise SchemeSyntaxError(ERR_MISSING_TYPE_ANNOTATION.format(TYPE_ANNOTATION_CHAR, p))
                     self.types[p] = parms[i + 2]
                     i += 3
                 else:
@@ -72,7 +81,7 @@ class Procedure:
                     val = args[i]
                     type_sym = self.types[p]
                     if not check_type(val, type_sym):
-                        raise TypeMismatchError(ERR_TYPE_MISMATCH)
+                        raise TypeMismatchError(ERR_TYPE_MISMATCH.format(type_sym, type(val).__name__))
 
     def __call__(self, *args: Exp) -> Any:
         """
@@ -128,11 +137,13 @@ def eval_if(x: Exp, env: Env) -> Any:
     Returns:
         Any: The result of the consequent or alternative, wrapped in TailCall.
     """
-    (_, test, conseq, alt) = x
+    (_, test, conseq, *alt) = x
     if eval(test, env):
         return TailCall(conseq, env)
+    elif alt:
+        return TailCall(alt[0], env)
     else:
-        return TailCall(alt, env)
+        return None
 
 
 def eval_set(x: Exp, env: Env) -> Any:
@@ -166,7 +177,7 @@ def eval_define(x: Exp, env: Env) -> Any:
         (_, var, _, type_sym, exp) = x
         val = eval(exp, env)
         if not check_type(val, type_sym):
-            raise TypeMismatchError(ERR_TYPE_MISMATCH)
+            raise TypeMismatchError(ERR_TYPE_MISMATCH.format(type_sym, type(val).__name__))
         env[var] = val
     else:
         (_, var, exp) = x

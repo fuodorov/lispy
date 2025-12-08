@@ -30,7 +30,7 @@ def check_type(val: Any, type_sym: str) -> bool:
         UserError: If the type symbol is unknown.
     """
     if type_sym not in TYPE_MAPPING:
-        raise UserError(ERR_UNKNOWN_TYPE)
+        raise UserError(ERR_UNKNOWN_TYPE.format(type_sym))
 
     expected_type = TYPE_MAPPING[type_sym]
     # Special case for numbers? In Python bool is int.

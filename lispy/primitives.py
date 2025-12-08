@@ -98,7 +98,7 @@ def curry(proc: Any) -> Any:
         Any: A new procedure that accepts arguments incrementally.
     """
     if not isinstance(proc, Procedure):
-        raise ArgumentError(ERR_CURRY_USER_PROC)
+        raise ArgumentError(ERR_CURRY_USER_PROC.format(proc))
 
     if not isinstance(proc.parms, list):
         raise ArgumentError(ERR_CURRY_VARIADIC)
