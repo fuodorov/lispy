@@ -127,6 +127,14 @@ Lispy позволяет использовать мощь экосистемы 
     (define cos (py-getattr math "cos"))
     (cos pi) ; -> -1.0
     ```
+*   **py-eval**: Выполняет строку кода Python и возвращает результат.
+    ```scheme
+    (py-eval "1 + 2") ; -> 3
+    ```
+*   **py-exec**: Выполняет строку кода Python (для побочных эффектов).
+    ```scheme
+    (py-exec "print('Hello from Python')")
+    ```
 
 ## Установка и запуск
 

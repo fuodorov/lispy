@@ -16,7 +16,8 @@ from typing import Any, Callable
 from .constants import FILE_WRITE_MODE
 from .env import Env
 from .errors import ArgumentError, Continuation, UserError
-from .evaluator import Procedure, eval
+from .evaluator import Procedure
+from .evaluator import eval as lispy_eval
 from .macros import expand
 from .messages import ERR_CURRY_USER_PROC, ERR_CURRY_VARIADIC
 from .parser import read, readchar, to_string
@@ -184,7 +185,7 @@ def add_globals(env: Env) -> Env:
         'null?': lambda x: x == [], 'symbol?': lambda x: isinstance(x, Symbol),
         'boolean?': lambda x: isinstance(x, bool), 'pair?': is_pair,
         'port?': lambda x: isinstance(x, io.IOBase), 'apply': lambda proc, lst: proc(*lst),
-        'eval': lambda x: eval(expand(x)), 'load': lambda fn: load(fn), 'call/cc': callcc,
+        'eval': lambda x: lispy_eval(expand(x)), 'load': lambda fn: load(fn), 'call/cc': callcc,
         'force': force, 'make-promise': make_promise, 'curry': curry,
         'open-input-file': open, 'close-input-port': lambda p: p.file.close(),
         'open-output-file': lambda f: open(f, FILE_WRITE_MODE), 'close-output-port': lambda p: p.close(),
@@ -195,5 +196,7 @@ def add_globals(env: Env) -> Env:
         'str': str,
         'py-import': importlib.import_module,
         'py-getattr': getattr,
+        'py-eval': lambda x: eval(x),
+        'py-exec': lambda x: exec(x),
     })
     return env

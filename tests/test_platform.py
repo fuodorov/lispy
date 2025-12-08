@@ -23,3 +23,14 @@ def test_py_getattr_nested():
     run("(define v-info (py-getattr sys \"version_info\"))")
     major = run("(py-getattr v-info \"major\")")
     assert isinstance(major, int)
+
+
+def test_py_eval():
+    assert run("(py-eval \"1 + 2\")") == 3
+    assert run("(py-eval \"'hello' + ' world'\")") == "hello world"
+
+
+def test_py_exec():
+    # exec returns None, but we can check side effects if we could share scope.
+    # Since we don't share scope easily yet, just check it runs without error.
+    assert run("(py-exec \"print('hello from python')\")") is None
