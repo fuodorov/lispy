@@ -235,7 +235,11 @@ def expand_dynamic_let(x: Exp, toplevel: bool) -> Exp:
     bindings, body = x[1], x[2:]
     require(x, isinstance(bindings, list), ERR_ILLEGAL_BINDING.format(to_string(bindings)))
     for b in bindings:
-        require(x, isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol), ERR_ILLEGAL_BINDING.format(to_string(b)))
+        require(
+            x,
+            isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol),
+            ERR_ILLEGAL_BINDING.format(to_string(b))
+        )
     expanded_bindings = [[b[0], expand(b[1], toplevel)] for b in bindings]
     expanded_body = [expand(e, toplevel) for e in body]
     return [_dynamic_let, expanded_bindings] + expanded_body
@@ -327,7 +331,11 @@ def let(*args: Exp) -> Exp:
     bindings, body = args[0], args[1:]
     require(x, isinstance(bindings, list), ERR_ILLEGAL_BINDING.format(to_string(bindings)))
     for b in bindings:
-        require(x, isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol), ERR_ILLEGAL_BINDING.format(to_string(b)))
+        require(
+            x,
+            isinstance(b, list) and len(b) == 2 and isinstance(b[0], Symbol),
+            ERR_ILLEGAL_BINDING.format(to_string(b))
+        )
     if not bindings:
         vars, vals = [], []
     else:
