@@ -6,6 +6,7 @@ environment, such as arithmetic operations, list manipulation, and I/O.
 """
 import cmath
 import functools
+import importlib
 import io
 import math
 import operator as op
@@ -191,6 +192,8 @@ def add_globals(env: Env) -> Env:
         'read': read, 'write': lambda x, port=sys.stdout: port.write(to_string(x)),
         'display': lambda x, port=sys.stdout: port.write(x if isinstance(x, str) else to_string(x)),
         'raise': raise_error,
-        'str': str
+        'str': str,
+        'py-import': importlib.import_module,
+        'py-getattr': getattr,
     })
     return env
