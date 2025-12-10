@@ -27,6 +27,7 @@ from .types import (
     _define,
     _definemacro,
     _delay,
+    _do,
     _dynamic_let,
     _if,
     _lambda,
@@ -358,4 +359,71 @@ def delay(exp: Exp) -> Exp:
     return [_make_promise, [_lambda, [], exp]]
 
 
-macro_table = {_let: let, _delay: delay}
+def do_macro(*args: Exp) -> Exp:
+    """
+    Expand a `do` expression.
+
+    (do ((var init [step]) ...) (test expr ...) command ...)
+
+    Args:
+        *args (Exp): The arguments to the do macro.
+
+    Returns:
+        Exp: The expanded expression.
+    """
+    args = list(args)
+    x = [_do] + args
+    require(x, len(args) >= 2)
+    bindings = args[0]
+    test_and_result = args[1]
+    commands = args[2:]
+
+    require(x, isinstance(bindings, list), ERR_ILLEGAL_BINDING.format(to_string(bindings)))
+    require(x, isinstance(test_and_result, list) and len(test_and_result) >= 1, ERR_WRONG_LENGTH)
+
+    vars_ = []
+    inits = []
+    steps = []
+    for b in bindings:
+        require(
+            x,
+            isinstance(b, list) and 2 <= len(b) <= 3 and isinstance(b[0], Symbol),
+            ERR_ILLEGAL_BINDING.format(to_string(b))
+        )
+        vars_.append(b[0])
+        inits.append(b[1])
+        if len(b) == 3:
+            steps.append(b[2])
+        else:
+            steps.append(b[0])
+
+    test = test_and_result[0]
+    result_exprs = test_and_result[1:]
+
+    loop_name = Symbol('__do_loop__')
+
+    if not result_exprs:
+        conseq = [_quote, None]
+    elif len(result_exprs) == 1:
+        conseq = result_exprs[0]
+    else:
+        conseq = [_begin] + result_exprs
+
+    recur_call = [loop_name] + steps
+    if not commands:
+        alt = recur_call
+    else:
+        alt = [_begin] + commands + [recur_call]
+
+    # ((lambda (vars...)
+    #    (define (loop vars...) (if test conseq alt))
+    #    (loop vars...))
+    #  inits...)
+
+    loop_def = [_define, [loop_name] + vars_, [_if, test, conseq, alt]]
+    body = [loop_def, [loop_name] + vars_]
+
+    return [[_lambda, vars_] + body] + inits
+
+
+macro_table = {_let: let, _delay: delay, _do: do_macro}

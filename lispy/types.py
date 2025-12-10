@@ -73,6 +73,7 @@ _try = get_symbol('try')
 _dynamic_let = get_symbol('dynamic-let')
 _delay = get_symbol('delay')
 _make_promise = get_symbol('make-promise')
+_do = get_symbol('do')
 
 EOF_OBJECT = get_symbol('#<eof-object>')
 

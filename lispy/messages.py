@@ -3,7 +3,7 @@ Error messages and constants for Lispy.
 """
 ERR_WRONG_LENGTH = "Incorrect number of arguments"
 ERR_CANT_SPLICE = "Unquote-splicing is not allowed in this context"
-ERR_ILLEGAL_BINDING = "Illegal binding list in let/dynamic-let: '{}'"
+ERR_ILLEGAL_BINDING = "Illegal binding list: '{}'"
 ERR_DEFINE_MACRO_TOPLEVEL = "Define-macro is only allowed at the top level"
 ERR_MACRO_PROCEDURE = "Macro body must evaluate to a procedure, got '{}'"
 ERR_DEFINE_SYMBOL = "First argument to 'define' must be a symbol, got '{}'"
