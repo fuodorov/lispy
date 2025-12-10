@@ -1,9 +1,11 @@
 
-import pytest
 import re
-from tests.utils import run
+
+import pytest
+
 from lispy.errors import SchemeSyntaxError
 from lispy.messages import ERR_ILLEGAL_BINDING, ERR_WRONG_LENGTH
+from tests.utils import run
 
 
 def test_do_simple():
