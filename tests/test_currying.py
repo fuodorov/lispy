@@ -1,5 +1,6 @@
 import pytest
-from lispy.errors import ArgumentError, UserError
+
+from lispy.errors import UserError
 from tests.utils import run
 
 
@@ -70,7 +71,7 @@ def test_curry_nested_promise():
     )
     """
     assert run(code) == 30
-    
+
 
 def test_curry_promise_execution_error():
     # Should propagate error from inside promise

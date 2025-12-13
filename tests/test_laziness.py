@@ -77,12 +77,12 @@ def test_nested_promises_memoization():
     code = """
     (begin
         (define count 0)
-        (define p (delay 
-                    (begin 
-                        (set! count (+ count 1)) 
-                        (delay 
-                            (begin 
-                                (set! count (+ count 10)) 
+        (define p (delay
+                    (begin
+                        (set! count (+ count 1))
+                        (delay
+                            (begin
+                                (set! count (+ count 10))
                                 count)))))
         (define val1 (force p))
         (define val2 (force p))
@@ -97,4 +97,3 @@ def test_nested_promises_memoization():
 
 def test_force_non_promise():
     assert run("(force 123)") == 123
-
