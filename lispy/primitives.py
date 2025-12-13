@@ -100,7 +100,10 @@ def curry(proc: Any) -> Any:
         Any: A new procedure that accepts arguments incrementally.
     """
     if isinstance(proc, Promise):
-        proc = force(proc)
+        def lazy_curried(*args):
+            real_proc = force(proc)
+            return curry(real_proc)(*args)
+        return lazy_curried
 
     if not isinstance(proc, Procedure):
         raise ArgumentError(ERR_CURRY_USER_PROC.format(proc))

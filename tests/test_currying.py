@@ -1,6 +1,6 @@
 import pytest
 
-from lispy.errors import UserError
+from lispy.errors import ArgumentError, UserError
 from tests.utils import run
 
 
@@ -74,12 +74,36 @@ def test_curry_nested_promise():
 
 
 def test_curry_promise_execution_error():
-    # Should propagate error from inside promise
+    # Should propagate error from inside promise ONLY when called
     code = """
     (begin
         (define p (delay (raise "oops")))
-        (curry p)
+        (define c (curry p))
+        (c 1)
     )
     """
     with pytest.raises(UserError, match="oops"):
         run(code)
+
+
+def test_curry_lazy_behavior():
+    # Ensure side effects happen only when curried function is called
+    code = """
+    (begin
+        (define side-effect 0)
+        (define (my-add x y) (+ x y))
+        (define p (delay (begin (set! side-effect 1) my-add)))
+        
+        (define c (curry p))
+        
+        (if (= side-effect 1)
+            "Eager"
+            (begin
+                (c 1 2)
+                (if (= side-effect 1)
+                    "Lazy"
+                    "Broken")))
+    )
+    """
+    assert run(code) == "Lazy"
+
