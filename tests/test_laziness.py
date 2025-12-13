@@ -59,3 +59,42 @@ def test_integers_stream():
     )
     """
     assert run(code) == [1, 2, 3]
+
+
+def test_nested_promises():
+    # Test that force recursively unwraps promises
+    code = """
+    (begin
+        (define p (delay (delay (delay 42))))
+        (force p)
+    )
+    """
+    assert run(code) == 42
+
+
+def test_nested_promises_memoization():
+    # Ensure side effects in nested promises happen correctly and are memoized
+    code = """
+    (begin
+        (define count 0)
+        (define p (delay 
+                    (begin 
+                        (set! count (+ count 1)) 
+                        (delay 
+                            (begin 
+                                (set! count (+ count 10)) 
+                                count)))))
+        (define val1 (force p))
+        (define val2 (force p))
+        (list val1 val2 count)
+    )
+    """
+    # First force: outer runs (+1), returns inner. Inner runs (+10), returns 11. Total count 11.
+    # Second force: outer is memoized (inner promise). Inner is memoized (11). Returns 11.
+    # Count should remain 11.
+    assert run(code) == [11, 11, 11]
+
+
+def test_force_non_promise():
+    assert run("(force 123)") == 123
+

@@ -81,11 +81,11 @@ def force(obj: Any) -> Any:
     Returns:
         Any: The result of the promise evaluation, or the object itself if not a promise.
     """
-    if isinstance(obj, Promise):
+    while isinstance(obj, Promise):
         if not obj.computed:
             obj.memo = obj.proc()
             obj.computed = True
-        return obj.memo
+        obj = obj.memo
     return obj
 
 
