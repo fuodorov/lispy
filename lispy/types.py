@@ -4,7 +4,7 @@ Type definitions for Lispy.
 This module defines the types used in the interpreter, such as `Symbol`, `Exp`,
 and `Atom`.
 """
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from .constants import QUASIQUOTE_CHAR, QUOTE_CHAR, UNQUOTE_CHAR, UNQUOTE_SPLICING_CHAR
 
@@ -19,10 +19,10 @@ class Promise:
     """
     A Scheme Promise (delayed evaluation).
     """
-    def __init__(self, proc: Any) -> None:
-        self.proc = proc
-        self.memo = None
-        self.computed = False
+    def __init__(self, proc: Callable[[], Any]) -> None:
+        self.proc: Callable[[], Any] = proc
+        self.memo: Optional[Any] = None
+        self.computed: bool = False
 
 
 class Symbol(str):

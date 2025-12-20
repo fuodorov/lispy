@@ -42,7 +42,7 @@ class Env(dict):
             self.update({parms: list(args)})
         else:
             if len(args) != len(parms):
-                raise ArgumentError('expected %s, given %s, ' % (to_string(parms), to_string(args)))
+                raise ArgumentError('expected %s, given %s' % (to_string(parms), to_string(args)))
             self.update(zip(parms, args))
 
     def find(self, var: Symbol) -> 'Env':

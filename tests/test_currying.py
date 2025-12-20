@@ -1,6 +1,6 @@
 import pytest
 
-from lispy.errors import ArgumentError, UserError
+from lispy.errors import UserError
 from tests.utils import run
 
 
@@ -93,9 +93,9 @@ def test_curry_lazy_behavior():
         (define side-effect 0)
         (define (my-add x y) (+ x y))
         (define p (delay (begin (set! side-effect 1) my-add)))
-        
+
         (define c (curry p))
-        
+
         (if (= side-effect 1)
             "Eager"
             (begin
@@ -106,4 +106,3 @@ def test_curry_lazy_behavior():
     )
     """
     assert run(code) == "Lazy"
-

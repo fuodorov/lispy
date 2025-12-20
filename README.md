@@ -31,7 +31,7 @@ lispy/
     __init__.py    # Инициализация пакета, определение встроенных макросов
     __main__.py    # Точка входа (python -m lispy)
     types.py       # Типы данных (Symbol, Exp, Atom)
-    constants.py   # Константы и настрцойки
+    constants.py   # Константы и настройки
     errors.py      # Классы исключений
     messages.py    # Тексты сообщений об ошибках
     parser.py      # Токенизатор и парсер (read)
@@ -55,7 +55,7 @@ tests/
     test_currying.py       # Тесты каррирования
     test_types.py          # Тесты системы типов
     test_platform.py       # Тесты взаимодействия с Python
-    test_types.py          # Тесты системы типов
+
 ```
 
 ## Архитектура и устройство
